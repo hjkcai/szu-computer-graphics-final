@@ -10,6 +10,8 @@ private:
 public:
   Texture (const char *file);
   ~Texture ();
+
+  GLuint id () const { return _id; }
 };
 
 #endif
