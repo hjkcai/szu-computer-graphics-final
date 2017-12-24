@@ -3,15 +3,11 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model (const char *model, Shader *shader) {
+Model::Model (const char *model, Texture *texture, Shader *shader) {
   loadObj(model);
   this->shader = shader;
-  init();
-}
+  this->texture = texture;
 
-Model::Model (const char *model, const char *vshader, const char *fshader) {
-  loadObj(model);
-  this->shader = new Shader(vshader, fshader);
   init();
 }
 

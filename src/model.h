@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "shader.h"
+#include "texture.h"
 
 class Model {
 private:
@@ -21,14 +22,14 @@ private:
 
 public:
   Shader *shader;
+  Texture *texture;
 
   // 参数设置
   float scale = 1;
   float x = 0, y = 0, z = 0;
   float rotationX = 0, rotationY = 0, rotationZ = 0;
 
-  Model (const char *model, Shader *shader);
-  Model (const char *model, const char *vshader, const char *fshader);
+  Model (const char *model, Texture *texture = NULL, Shader *shader = NULL);
   ~Model ();
 
   std::vector<glm::vec3> getVertices () const { return vertices; }
