@@ -86,5 +86,27 @@ Shader::Shader (const char *vshader, const char *fshader) {
   glDeleteShader(VertexShaderID);
   glDeleteShader(FragmentShaderID);
 
-  _id = ProgramID;
+  // 记录 id
+  programId = ProgramID;
+	mvpId = glGetUniformLocation(programId, "mvp");
+  textureId = glGetUniformLocation(programId, "textureSampler");
+}
+
+Shader::~Shader () {
+  glDeleteProgram(programId);
+  programId = 0;
+}
+
+void Shader::use () {
+  glUseProgram(programId);
+}
+
+void Shader::setMvp (const glm::mat4 &data) {
+  glUniformMatrix4fv(mvpId, 1, GL_FALSE, &data[0][0]);
+}
+
+void Shader::setTexture (const Texture *texture) {
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture->id());
+  glUniform1i(textureSamplerId, 0);
 }
