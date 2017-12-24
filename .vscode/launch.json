@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/final",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": true,
+      "preLaunchTask": "build",
+      "MIMode": "gdb",
+      "logging": {
+        "engineLogging": false,
+        "moduleLoad": false,
+        "programOutput": true,
+        "trace": false,
+        "traceResponse": false
+      }
+    }
+  ],
+  "compounds": []
+}
