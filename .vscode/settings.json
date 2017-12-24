@@ -9,6 +9,10 @@
     "new": "cpp",
     "stdexcept": "cpp",
     "typeinfo": "cpp",
-    "algorithm": "cpp"
-  }
+    "algorithm": "cpp",
+    "ios": "cpp"
+  },
+  "cSpell.words": [
+    "glew"
+  ]
 }

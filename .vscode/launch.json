@@ -12,7 +12,7 @@
       "environment": [],
       "externalConsole": true,
       "preLaunchTask": "build",
-      "MIMode": "gdb",
+      "MIMode": "lldb",
       "logging": {
         "engineLogging": false,
         "moduleLoad": false,

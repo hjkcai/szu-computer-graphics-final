@@ -12,10 +12,10 @@ FLAGS=-lGL -lpthread -lsfml-system -lsfml-window -lsfml-graphics -lGLEW
 endif
 
 $(TARGET): $(OFILES)
-	g++-7 -g -o $(TARGET) $(OFILES) $(FLAGS)
+	g++ -g -o $(TARGET) $(OFILES) $(FLAGS)
 
 build/%.o: src/%.cpp
-	g++-7 $(CC_FLAGS) -o $@ -c $<
+	g++ $(CC_FLAGS) -o $@ -c $<
 
 clean:
 	rm -rf $(TARGET) $(TARGET).dSYM $(OFILES)
