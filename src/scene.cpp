@@ -16,6 +16,6 @@ Scene::~Scene () {
   delete camera;
 }
 
-void render (Renderer *renderer) {
+void Scene::render (Renderer *renderer) {
   renderer->drawModel(teacup);
 }
