@@ -9,7 +9,7 @@
 
 class Model {
 private:
-  GLuint vao, buffer;
+  GLuint vao, vBuffer, uvBuffer;
   std::vector<glm::vec3> vertices;
   std::vector<glm::vec2> uvs;
   std::vector<glm::vec3> normals;
@@ -29,6 +29,14 @@ public:
 
   Model (const char *model, Shader *shader);
   Model (const char *model, const char *vshader, const char *fshader);
+  ~Model ();
+
+  std::vector<glm::vec3> getVertices () const { return vertices; }
+  std::vector<glm::vec2> getUVs () const { return uvs; }
+  std::vector<glm::vec3> getNormals () const { return normals; }
+
+  GLuint getVertexBuffer () const { return vBuffer; }
+  GLuint getUVBuffer () const { return uvBuffer; }
 
   Model* update ();
   glm::mat4 modelMatrix () const;

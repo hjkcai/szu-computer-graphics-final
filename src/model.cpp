@@ -15,11 +15,22 @@ Model::Model (const char *model, const char *vshader, const char *fshader) {
   init();
 }
 
+Model::~Model () {
+  glDeleteBuffers(1, &vBuffer); vBuffer = 0;
+  glDeleteBuffers(1, &uvBuffer); uvBuffer = 0;
+  glDeleteVertexArrays(1, &vao); vao = 0;
+}
+
 void Model::init () {
   glGenVertexArrays(1, &vao);
-  glGenBuffers(1, &buffer);
-  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
+  glGenBuffers(1, &vBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+	glGenBuffers(1, &uvBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
 }
 
 void Model::loadObj (const char *path) {
