@@ -89,7 +89,7 @@ Shader::Shader (const char *vshader, const char *fshader) {
   // 记录 id
   programId = ProgramID;
 	mvpId = glGetUniformLocation(programId, "mvp");
-  textureId = glGetUniformLocation(programId, "textureSampler");
+  textureSamplerId = glGetUniformLocation(programId, "textureSampler");
 }
 
 Shader::~Shader () {
