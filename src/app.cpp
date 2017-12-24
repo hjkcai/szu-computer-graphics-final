@@ -30,6 +30,7 @@ void Application::createWindow (const std::string &title) {
 
 void Application::mainLoop () {
   while (window->isOpen()) {
+    renderer->clear();
     scene->render(renderer);
     handleWindowEvents();
   }
