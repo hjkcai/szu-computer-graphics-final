@@ -2,10 +2,11 @@
 
 in vec3 vPosition;
 in vec2 vUV;
+uniform mat4 mvp;
 
 out vec2 UV;
 
 void main () {
-  gl_Position = vec4(vPosition, 1.0);
+  gl_Position = mvp * vec4(vPosition, 1.0);
   UV = vertexUV;
 }

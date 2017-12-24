@@ -1,9 +1,21 @@
 #include "model.h"
 #include <string>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-Model::Model (const char *file) {
-  loadObj(file);
+Model::Model (const char *model, Shader *shader) {
+  loadObj(model);
+  this->shader = shader;
+  init();
+}
 
+Model::Model (const char *model, const char *vshader, const char *fshader) {
+  loadObj(model);
+  this->shader = new Shader(vshader, fshader);
+  init();
+}
+
+void Model::init () {
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &buffer);
   glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -96,4 +108,24 @@ void Model::loadObj (const char *path) {
   }
 
   fclose(file);
+}
+
+Model* Model::update () {
+  _modelMatrix =
+    // 平移
+    glm::translate(glm::mat4(), glm::vec3(x, y, z)) *
+
+    // 旋转
+    glm::rotate(rotationX, glm::vec3(1, 0, 0)) *
+    glm::rotate(rotationY, glm::vec3(0, 1, 0)) *
+    glm::rotate(rotationZ, glm::vec3(0, 0, 1)) *
+
+    // 缩放
+    glm::scale(glm::vec3(scale));
+
+  return this;
+}
+
+glm::mat4 Model::modelMatrix () const {
+  return _modelMatrix;
 }
