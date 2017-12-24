@@ -2,13 +2,15 @@
 #define __CG_APP_H__
 
 #include <string>
-#include "context.h"
+#include <SFML/Graphics.hpp>
 
 class Application {
 private:
-  Context *ctx;
+  void createWindow (const std::string &title);
 
 public:
+  sf::RenderWindow *window;
+
   Application (const std::string &title);
   ~Application ();
 
