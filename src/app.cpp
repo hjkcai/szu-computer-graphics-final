@@ -3,6 +3,8 @@
 
 Application::Application (const std::string &title) {
   createWindow(title);
+  scene = new Scene();
+  renderer = new Renderer();
 }
 
 Application::~Application () {
@@ -28,6 +30,7 @@ void Application::createWindow (const std::string &title) {
 
 void Application::mainLoop () {
   while (window->isOpen()) {
+    scene->render(renderer);
     handleWindowEvents();
   }
 }
