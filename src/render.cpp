@@ -13,7 +13,7 @@ void Renderer::clear () const {
   glClear(paramsOfClearing);
 }
 
-void Renderer::render (const Model *model) const {
+void Renderer::drawModel (const Model *model) const {
   model->shader->use();
 
   // vertices

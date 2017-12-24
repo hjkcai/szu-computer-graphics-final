@@ -15,7 +15,7 @@ public:
   void setClearParams (const GLbitfield &params);
 
   void clear () const;
-  void render (const Model *model) const;
+  void drawModel (const Model *model) const;
 };
 
 #endif
