@@ -10,8 +10,6 @@ private:
 public:
   Texture (const char *file);
   ~Texture ();
-
-  void bind () const;
 };
 
 #endif

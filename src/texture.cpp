@@ -22,9 +22,3 @@ Texture::Texture (const char *file) {
 Texture::~Texture () {
   glDeleteTextures(1, &_id);
 }
-
-void Texture::bind () const {
-  glBindTexture(GL_TEXTURE_2D, _id);
-}
-
-
