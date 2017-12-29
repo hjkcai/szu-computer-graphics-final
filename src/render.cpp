@@ -18,7 +18,7 @@ void Renderer::drawModel (const Camera *camera, const Model *model) const {
   model->shader->setMvp(camera->mvp(model->modelMatrix()));
   model->shader->setTexture(model->texture);
 
-  // vertices
+  // Vertices
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, model->getVertexBuffer());
   glVertexAttribPointer(
@@ -42,6 +42,19 @@ void Renderer::drawModel (const Camera *camera, const Model *model) const {
     (void*)0                          // array buffer offset
   );
 
+  // Normals
+  glEnableVertexAttribArray(2);
+  glBindBuffer(GL_ARRAY_BUFFER, model->getNormalBuffer());
+  glVertexAttribPointer(
+    2,                                // attribute
+    3,                                // size
+    GL_FLOAT,                         // type
+    GL_FALSE,                         // normalized?
+    0,                                // stride
+    (void*)0                          // array buffer offset
+  );
+
+  // 绘制模型
   glDrawArrays(GL_TRIANGLES, 0, model->getVertices().size());
 
   glDisableVertexAttribArray(0);

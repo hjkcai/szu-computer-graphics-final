@@ -10,7 +10,7 @@
 
 class Model {
 private:
-  GLuint vBuffer, uvBuffer;
+  GLuint vBuffer, uvBuffer, normalBuffer;
   std::vector<glm::vec3> vertices;
   std::vector<glm::vec2> uvs;
   std::vector<glm::vec3> normals;
@@ -38,6 +38,7 @@ public:
 
   GLuint getVertexBuffer () const { return vBuffer; }
   GLuint getUVBuffer () const { return uvBuffer; }
+  GLuint getNormalBuffer () const { return normalBuffer; }
 
   Model* update ();
   glm::mat4 modelMatrix () const;
