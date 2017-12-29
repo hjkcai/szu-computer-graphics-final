@@ -9,6 +9,7 @@ Model::Model (const char *model, Texture *texture, Shader *shader) {
   this->texture = texture;
 
   init();
+  update();
 }
 
 Model::~Model () {
@@ -19,6 +20,7 @@ Model::~Model () {
 
 void Model::init () {
   glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
 
   glGenBuffers(1, &vBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
@@ -104,9 +106,9 @@ void Model::loadObj (const char *path) {
     unsigned int normalIndex = normalIndices[i];
 
     // Get the attributes thanks to the index
-    glm::vec3 vertex = vertices[vertexIndex - 1];
-    glm::vec2 uv = uvs[uvIndex - 1];
-    glm::vec3 normal = normals[normalIndex - 1];
+    glm::vec3 vertex = temp_vertices[vertexIndex - 1];
+    glm::vec2 uv = temp_uvs[uvIndex - 1];
+    glm::vec3 normal = temp_normals[normalIndex - 1];
 
     // Put the attributes in buffers
     vertices.push_back(vertex);
