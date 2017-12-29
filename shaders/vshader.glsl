@@ -1,7 +1,7 @@
 #version 330 core
 
-in vec3 vPosition;
-in vec2 vUV;
+layout(location = 0) in vec3 vPosition;
+layout(location = 1) in vec2 vertexUV;
 uniform mat4 mvp;
 
 out vec2 UV;
