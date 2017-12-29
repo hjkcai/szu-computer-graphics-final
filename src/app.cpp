@@ -1,10 +1,11 @@
 #include "app.h"
 #include <GL/glew.h>
+#include <iostream>
 
 Application::Application (const std::string &title) {
   createWindow(title);
-  scene = new Scene();
   renderer = new Renderer();
+  scene = new Scene();
 }
 
 Application::~Application () {
@@ -20,18 +21,23 @@ void Application::createWindow (const std::string &title) {
   settings.stencilBits = 8;
 
   window = new sf::RenderWindow();
-  window->create({ 800, 600 }, title.c_str(), sf::Style::Close, settings);
+  window->create({ 600, 600 }, title.c_str(), sf::Style::Close, settings);
   window->setFramerateLimit(60);
 
-  glewInit();
   glewExperimental = GL_TRUE;
-  glViewport(0, 0, 800, 600);
+  if (glewInit() != GLEW_OK) {
+    std::cout << "Failed to initialize glew" << std::endl;
+  }
+
+  glViewport(0, 0, 600, 600);
 }
 
 void Application::mainLoop () {
+  glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
   while (window->isOpen()) {
     renderer->clear();
     scene->render(renderer);
+    window->display();
     handleWindowEvents();
   }
 }
