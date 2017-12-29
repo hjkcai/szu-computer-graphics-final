@@ -28,10 +28,15 @@
     "unordered_map": "cpp",
     "utility": "cpp",
     "valarray": "cpp",
-    "vector": "cpp"
+    "vector": "cpp",
+    "__locale": "cpp",
+    "type_traits": "cpp",
+    "cctype": "cpp",
+    "cstddef": "cpp"
   },
   "cSpell.words": [
     "Luint",
+    "Programiv",
     "fshader",
     "glew",
     "vshader"

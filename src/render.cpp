@@ -14,8 +14,11 @@ void Renderer::clear () const {
 }
 
 void Renderer::drawModel (const Camera *camera, const Model *model) const {
+  // 计算模-视矩阵
+  glm::mat4 mvp = camera->getViewProjectionMatrix() * model->modelMatrix();
+
   model->shader->use();
-  model->shader->setMvp(camera->mvp(model->modelMatrix()));
+  model->shader->setMvp(mvp);
   model->shader->setTexture(model->texture);
 
   // Vertices

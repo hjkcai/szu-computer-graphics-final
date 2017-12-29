@@ -22,9 +22,11 @@ public:
   glm::vec3 up = glm::vec3(0, 1, 0);
 
   Camera ();
-
   void update ();
-  glm::mat4 mvp (const glm::mat4 &model) const;
+
+  glm::mat4 getViewMatrix () const { return view; }
+  glm::mat4 getProjectionMatrix () const { return projection; }
+  glm::mat4 getViewProjectionMatrix () const { return vp; }
 };
 
 #endif
