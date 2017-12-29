@@ -17,6 +17,7 @@ void Renderer::drawModel (const Camera *camera, const Model *model) const {
   // 计算模-视矩阵
   auto MVP = camera->getViewProjectionMatrix() * model->modelMatrix();
 
+  // 设置 shader 参数
   auto shader = model->shader;
   shader->use();
   shader->setMVP(MVP);
@@ -25,45 +26,26 @@ void Renderer::drawModel (const Camera *camera, const Model *model) const {
   shader->setLightPosition(glm::vec3(4, 4, 4));
   shader->setTexture(model->texture);
 
-  // Vertices
+  // 绑定顶点数据
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, model->getVertexBuffer());
-  glVertexAttribPointer(
-    0,                  // attribute
-    3,                  // size
-    GL_FLOAT,           // type
-    GL_FALSE,           // normalized?
-    0,                  // stride
-    (void*)0            // array buffer offset
-  );
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-  // UVs
+  // 绑定纹理映射数据 (UVs)
   glEnableVertexAttribArray(1);
   glBindBuffer(GL_ARRAY_BUFFER, model->getUVBuffer());
-  glVertexAttribPointer(
-    1,                                // attribute
-    2,                                // size
-    GL_FLOAT,                         // type
-    GL_FALSE,                         // normalized?
-    0,                                // stride
-    (void*)0                          // array buffer offset
-  );
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
   // Normals
   glEnableVertexAttribArray(2);
   glBindBuffer(GL_ARRAY_BUFFER, model->getNormalBuffer());
-  glVertexAttribPointer(
-    2,                                // attribute
-    3,                                // size
-    GL_FLOAT,                         // type
-    GL_FALSE,                         // normalized?
-    0,                                // stride
-    (void*)0                          // array buffer offset
-  );
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
   // 绘制模型
   glDrawArrays(GL_TRIANGLES, 0, model->getVertices().size());
 
+  // 清理绘制内容
   glDisableVertexAttribArray(0);
   glDisableVertexAttribArray(1);
+  glDisableVertexAttribArray(2);
 }
