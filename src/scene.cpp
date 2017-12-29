@@ -3,19 +3,28 @@
 
 Scene::Scene () {
   camera = new Camera();
+  camera->eye = glm::vec3(0, 0, 4);
+  camera->update();
+
   shader = new Shader("shaders/vshader.glsl", "shaders/fshader.glsl");
 
-  auto teacupTexture = new Texture("textures/teacup.tiff");
-  teacup = new Model("models/teacup.obj", teacupTexture, shader);
+  auto tableTexture = new Texture("textures/table.png");
+  table = new Model("models/table.obj", tableTexture, shader);
+  table->rotationX = -90;
+  table->y = -0.5;
+  table->z = -1;
+  table->update();
 }
 
 Scene::~Scene () {
-  delete teacup->texture;
-  delete teacup;
+  delete table->texture;
+  delete table;
   delete shader;
   delete camera;
 }
 
 void Scene::render (Renderer *renderer) {
-  renderer->drawModel(teacup);
+  renderer->drawModel(camera, table);
+  table->rotationX += 0.01f;
+  table->update();
 }

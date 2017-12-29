@@ -9,7 +9,7 @@
 class Scene {
 private:
   Camera *camera;
-  Model *teacup;
+  Model *table;
   Shader *shader;
 
 public:
