@@ -105,45 +105,45 @@ void Shader::addUniform (const char *name) {
 }
 
 void Shader::initUniforms () {
-  uniforms["MVP"] = glGetUniformLocation(programId, "MVP");
-  uniforms["Model"] = glGetUniformLocation(programId, "Model");
-  uniforms["View"] = glGetUniformLocation(programId, "View");
-  uniforms["LightColor"] = glGetUniformLocation(programId, "LightColor");
-  uniforms["LightPower"] = glGetUniformLocation(programId, "LightPower");
-  uniforms["LightPosition"] = glGetUniformLocation(programId, "LightPosition");
-  uniforms["textureSampler"] = glGetUniformLocation(programId, "textureSampler");
+  uniforms[MODEL_MATRIX] = glGetUniformLocation(programId, MODEL_MATRIX);
+  uniforms[VIEW_MATRIX] = glGetUniformLocation(programId, VIEW_MATRIX);
+  uniforms[PROJ_MATRIX] = glGetUniformLocation(programId, PROJ_MATRIX);
+  uniforms[LIGHT_COLOR] = glGetUniformLocation(programId, LIGHT_COLOR);
+  uniforms[LIGHT_POWER] = glGetUniformLocation(programId, LIGHT_POWER);
+  uniforms[LIGHT_POSITION] = glGetUniformLocation(programId, LIGHT_POSITION);
+  uniforms[TEXTURE_SAMPLER] = glGetUniformLocation(programId, TEXTURE_SAMPLER);
 }
 
 void Shader::use () {
   glUseProgram(programId);
 }
 
-void Shader::setMVP (const glm::mat4 &data) {
-  glUniformMatrix4fv(uniforms["MVP"], 1, GL_FALSE, &data[0][0]);
-}
-
 void Shader::setModel (const glm::mat4 &data) {
-  glUniformMatrix4fv(uniforms["Model"], 1, GL_FALSE, &data[0][0]);
+  glUniformMatrix4fv(uniforms[MODEL_MATRIX], 1, GL_FALSE, &data[0][0]);
 }
 
 void Shader::setView (const glm::mat4 &data) {
-  glUniformMatrix4fv(uniforms["View"], 1, GL_FALSE, &data[0][0]);
+  glUniformMatrix4fv(uniforms[VIEW_MATRIX], 1, GL_FALSE, &data[0][0]);
+}
+
+void Shader::setProjection (const glm::mat4 &data) {
+  glUniformMatrix4fv(uniforms[PROJ_MATRIX], 1, GL_FALSE, &data[0][0]);
 }
 
 void Shader::setLightColor (const glm::vec3 &data) {
-  glUniform3f(uniforms["LightColor"], data.x, data.y, data.z);
+  glUniform3f(uniforms[LIGHT_COLOR], data.x, data.y, data.z);
 }
 
 void Shader::setLightPower (const float &data) {
-  glUniform1f(uniforms["LightPower"], data);
+  glUniform1f(uniforms[LIGHT_POWER], data);
 }
 
 void Shader::setLightPosition (const glm::vec3 &data) {
-  glUniform3f(uniforms["LightPosition"], data.x, data.y, data.z);
+  glUniform3f(uniforms[LIGHT_POSITION], data.x, data.y, data.z);
 }
 
 void Shader::setTexture (const Texture *texture) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture->id());
-  glUniform1i(uniforms["textureSampler"], 0);
+  glUniform1i(uniforms[TEXTURE_SAMPLER], 0);
 }

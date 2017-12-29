@@ -14,14 +14,11 @@ void Renderer::clear () const {
 }
 
 void Renderer::drawModel (const Model *model, const Camera *camera, Shader *shader) const {
-  // 计算模-视矩阵
-  auto MVP = camera->getViewProjectionMatrix() * model->modelMatrix();
-
   // 设置 shader 参数
   shader->use();
-  shader->setMVP(MVP);
-  shader->setModel(model->modelMatrix());
+  shader->setModel(model->getModelMatrix());
   shader->setView(camera->getViewMatrix());
+  shader->setProjection(camera->getProjectionMatrix());
   shader->setLightPosition(glm::vec3(4, 4, 4));
   shader->setTexture(model->texture);
 

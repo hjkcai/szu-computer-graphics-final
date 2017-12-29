@@ -40,7 +40,7 @@ public:
   GLuint getNormalBuffer () const { return normalBuffer; }
 
   Model* update ();
-  glm::mat4 modelMatrix () const;
+  glm::mat4 getModelMatrix () const;
 };
 
 #endif

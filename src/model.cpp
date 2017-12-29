@@ -134,6 +134,6 @@ Model* Model::update () {
   return this;
 }
 
-glm::mat4 Model::modelMatrix () const {
+glm::mat4 Model::getModelMatrix () const {
   return _modelMatrix;
 }
