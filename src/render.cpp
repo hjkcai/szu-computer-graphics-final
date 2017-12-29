@@ -13,12 +13,11 @@ void Renderer::clear () const {
   glClear(paramsOfClearing);
 }
 
-void Renderer::drawModel (const Camera *camera, const Model *model) const {
+void Renderer::drawModel (const Model *model, const Camera *camera, Shader *shader) const {
   // 计算模-视矩阵
   auto MVP = camera->getViewProjectionMatrix() * model->modelMatrix();
 
   // 设置 shader 参数
-  auto shader = model->shader;
   shader->use();
   shader->setMVP(MVP);
   shader->setModel(model->modelMatrix());

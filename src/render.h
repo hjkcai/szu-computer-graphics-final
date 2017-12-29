@@ -5,6 +5,7 @@
 
 #include "camera.h"
 #include "model.h"
+#include "shader.h"
 
 class Renderer {
 private:
@@ -16,7 +17,7 @@ public:
   void setClearParams (const GLbitfield &params);
 
   void clear () const;
-  void drawModel (const Camera *camera, const Model *model) const;
+  void drawModel (const Model *model, const Camera *camera, Shader *shader) const;
 };
 
 #endif

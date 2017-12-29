@@ -2,10 +2,10 @@
 #define __CG_MODEL_H__
 
 #include <vector>
+#include <string>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include "shader.h"
 #include "texture.h"
 
 class Model {
@@ -21,7 +21,6 @@ private:
   void loadObj (const char *file);
 
 public:
-  Shader *shader;
   Texture *texture;
 
   // 参数设置
@@ -29,7 +28,7 @@ public:
   float x = 0, y = 0, z = 0;
   float rotationX = 0, rotationY = 0, rotationZ = 0;
 
-  Model (const char *model, Texture *texture = NULL, Shader *shader = NULL);
+  Model (const std::string &model, const std::string &texture);
   ~Model ();
 
   std::vector<glm::vec3> getVertices () const { return vertices; }

@@ -3,10 +3,9 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model (const char *model, Texture *texture, Shader *shader) {
-  loadObj(model);
-  this->shader = shader;
-  this->texture = texture;
+Model::Model (const std::string &model, const std::string &texture) {
+  loadObj(model.c_str());
+  this->texture = new Texture(texture.c_str());
 
   init();
   update();
