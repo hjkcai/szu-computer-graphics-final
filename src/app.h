@@ -2,6 +2,7 @@
 #define __CG_APP_H__
 
 #include <string>
+#include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 
 #include "render.h"
@@ -11,6 +12,7 @@ class Application {
 private:
   Scene *scene;
   Renderer *renderer;
+  GLuint vao;
   void createWindow (const std::string &title);
 
 public:

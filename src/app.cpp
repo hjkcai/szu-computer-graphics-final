@@ -30,6 +30,8 @@ void Application::createWindow (const std::string &title) {
   }
 
   glViewport(0, 0, 600, 600);
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
 }
 
 void Application::mainLoop () {

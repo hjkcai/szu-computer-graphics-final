@@ -15,13 +15,9 @@ Model::Model (const char *model, Texture *texture, Shader *shader) {
 Model::~Model () {
   glDeleteBuffers(1, &vBuffer); vBuffer = 0;
   glDeleteBuffers(1, &uvBuffer); uvBuffer = 0;
-  glDeleteVertexArrays(1, &vao); vao = 0;
 }
 
 void Model::init () {
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
   glGenBuffers(1, &vBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
