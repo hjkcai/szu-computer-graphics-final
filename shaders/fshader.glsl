@@ -7,54 +7,40 @@ in vec3 EyeDirection;
 in vec3 LightDirection;
 
 uniform sampler2D textureSampler;
+uniform vec3 LightColor;
+uniform float LightPower;
 uniform vec3 LightPosition;
 
 out vec3 color;
 
 void main () {
-  // TODO: make uniform
-  vec3 LightColor = vec3(1, 1, 1);
-	float LightPower = 50.0f;
-
-	// Distance to the light
+	// 光源与物体的距离，距离越远光照越弱
 	float distance = length(LightPosition - Position);
 
-	// Normal of the computed fragment, in camera space
+	// 计算漫反射参数
+	// 构造顶点法向量和光源方向的单位向量，并计算它们夹角的余弦值
 	vec3 n = normalize(Normal);
-
-	// Direction of the light (from the fragment to the light)
 	vec3 l = normalize(LightDirection);
-
-	// Cosine of the angle between the normal and the light direction,
-	// clamped above 0
-	//  - light is at the vertical of the triangle -> 1
-	//  - light is perpendicular to the triangle -> 0
-	//  - light is behind the triangle -> 0
 	float cosTheta = clamp(dot(n, l), 0, 1);
 
-	// Eye vector (towards the camera)
-	vec3 E = normalize(EyeDirection);
+	// 计算镜面反射参数
+	// 根据顶点法向量和光源方向计算反射光向量
+	// 再计算它和相机位置的夹角的余弦值
+	vec3 e = normalize(EyeDirection);
+	vec3 r = reflect(-l, n);
+	float cosAlpha = clamp(dot(e, r), 0, 1);
 
-	// Direction in which the triangle reflects the light
-	vec3 R = reflect(-l, n);
+	// 定义颜色
+  vec3 diffuseColor = texture(textureSampler, UV).rgb;
+	vec3 ambientColor = vec3(0.3, 0.3, 0.3) * diffuseColor;
+	vec3 specularColor = vec3(0.5, 0.5, 0.5);
 
-	// Cosine of the angle between the Eye vector and the Reflect vector,
-	// clamped to 0
-	//  - Looking into the reflection -> 1
-	//  - Looking elsewhere -> < 1
-	float cosAlpha = clamp(dot(E, R), 0, 1);
-
-  // Material color
-  vec3 MaterialDiffuseColor = texture(textureSampler, UV).rgb;
-	vec3 MaterialAmbientColor = vec3(0.3, 0.3, 0.3) * MaterialDiffuseColor;
-	vec3 MaterialSpecularColor = vec3(0.5, 0.5, 0.5);
-
-  // Output color
+  // 叠加三种光线并输出
 	color =
-		// Ambient : simulates indirect lighting
-		MaterialAmbientColor +
-		// Diffuse : "color" of the object
-		MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance * distance) +
-		// Specular : reflective highlight, like a mirror
-		MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha, 5) / (distance * distance);
+		// 环境光
+		ambientColor +
+		// 漫反射
+		diffuseColor * LightColor * LightPower * cosTheta / (distance * distance) +
+		// 镜面反射
+		specularColor * LightColor * LightPower * pow(cosAlpha, 5) / (distance * distance);
 }

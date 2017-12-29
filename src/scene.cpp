@@ -27,8 +27,15 @@ Scene::~Scene () {
 }
 
 void Scene::render (Renderer *renderer) {
-  // 绘制模型
+  // 启用 Shader
   shader->use();
+
+  // 设置光照参数
+  shader->setLightColor(light.color);
+  shader->setLightPower(light.power);
+  shader->setLightPosition(light.position);
+
+  // 绘制模型
   renderer->drawModel(table, camera, shader);
 
   // 增加一个简单的旋转动画

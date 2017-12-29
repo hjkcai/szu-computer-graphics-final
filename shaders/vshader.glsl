@@ -19,19 +19,19 @@ void main () {
   // 顶点位置
   gl_Position = MVP * vec4(vPosition, 1.0);
 
-  // Position of the vertex, in worldspace : M * position
+  // 计算世界坐标系中的顶点位置
   Position = (Model * vec4(vNormal, 1)).xyz;
 
-	// Vector that goes from the vertex to the camera, in camera space.
-	// In camera space, the camera is at the origin (0,0,0).
+	// 计算相机坐标系中，每个顶点到相机方向的向量
+	// 注：在相机坐标系中，相机始终在原点上
   EyeDirection = vec3(0, 0, 0) - (View * Model * vec4(vPosition, 1)).xyz;
 
-	// Vector that goes from the vertex to the light, in camera space. M is ommited because it's identity.
+	// 计算每个顶点到光源的向量
 	LightDirection = (View * vec4(LightPosition, 1)).xyz + EyeDirection;
 
-	// Normal of the the vertex, in camera space
-	Normal = (View * Model * vec4(vNormal, 0)).xyz; // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
+	// 计算相机坐标系中的各个顶点的法向量
+	Normal = (View * Model * vec4(vNormal, 0)).xyz;
 
-	// UV of the vertex. No special space for this one.
+	// 贴图位置
   UV = vertexUV;
 }

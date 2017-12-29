@@ -108,6 +108,8 @@ void Shader::initUniforms () {
   uniforms["MVP"] = glGetUniformLocation(programId, "MVP");
   uniforms["Model"] = glGetUniformLocation(programId, "Model");
   uniforms["View"] = glGetUniformLocation(programId, "View");
+  uniforms["LightColor"] = glGetUniformLocation(programId, "LightColor");
+  uniforms["LightPower"] = glGetUniformLocation(programId, "LightPower");
   uniforms["LightPosition"] = glGetUniformLocation(programId, "LightPosition");
   uniforms["textureSampler"] = glGetUniformLocation(programId, "textureSampler");
 }
@@ -126,6 +128,14 @@ void Shader::setModel (const glm::mat4 &data) {
 
 void Shader::setView (const glm::mat4 &data) {
   glUniformMatrix4fv(uniforms["View"], 1, GL_FALSE, &data[0][0]);
+}
+
+void Shader::setLightColor (const glm::vec3 &data) {
+  glUniform3f(uniforms["LightColor"], data.x, data.y, data.z);
+}
+
+void Shader::setLightPower (const float &data) {
+  glUniform1f(uniforms["LightPower"], data);
 }
 
 void Shader::setLightPosition (const glm::vec3 &data) {
