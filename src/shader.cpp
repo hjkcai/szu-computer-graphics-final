@@ -66,30 +66,27 @@ Shader::Shader (const char *vshader, const char *fshader) {
   }
 
   // Link the program
-  GLuint ProgramID = glCreateProgram();
-  glAttachShader(ProgramID, VertexShaderID);
-  glAttachShader(ProgramID, FragmentShaderID);
-  glLinkProgram(ProgramID);
+  programId = glCreateProgram();
+  glAttachShader(programId, VertexShaderID);
+  glAttachShader(programId, FragmentShaderID);
+  glLinkProgram(programId);
 
   // Check the program
-  glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-  glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+  glGetProgramiv(programId, GL_LINK_STATUS, &Result);
+  glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &InfoLogLength);
   if (InfoLogLength > 0) {
     std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-    glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+    glGetProgramInfoLog(programId, InfoLogLength, NULL, &ProgramErrorMessage[0]);
     printf("%s\n", &ProgramErrorMessage[0]);
   }
 
-  glDetachShader(ProgramID, VertexShaderID);
-  glDetachShader(ProgramID, FragmentShaderID);
+  glDetachShader(programId, VertexShaderID);
+  glDetachShader(programId, FragmentShaderID);
 
   glDeleteShader(VertexShaderID);
   glDeleteShader(FragmentShaderID);
 
-  // 记录 id
-  programId = ProgramID;
-	mvpId = glGetUniformLocation(programId, "mvp");
-  textureSamplerId = glGetUniformLocation(programId, "textureSampler");
+  initUniforms();
 }
 
 Shader::~Shader () {
@@ -97,16 +94,46 @@ Shader::~Shader () {
   programId = 0;
 }
 
+void Shader::addUniform (const char *name) {
+  auto result = glGetUniformLocation(programId, name);
+  if (result == -1) {
+    result = 0;
+    std::cout << "Error: " << glGetError() << std::endl;
+  }
+
+  uniforms[name] = result;
+}
+
+void Shader::initUniforms () {
+  uniforms["MVP"] = glGetUniformLocation(programId, "MVP");
+  uniforms["Model"] = glGetUniformLocation(programId, "Model");
+  uniforms["View"] = glGetUniformLocation(programId, "View");
+  uniforms["LightPosition"] = glGetUniformLocation(programId, "LightPosition");
+  uniforms["textureSampler"] = glGetUniformLocation(programId, "textureSampler");
+}
+
 void Shader::use () {
   glUseProgram(programId);
 }
 
-void Shader::setMvp (const glm::mat4 &data) {
-  glUniformMatrix4fv(mvpId, 1, GL_FALSE, &data[0][0]);
+void Shader::setMVP (const glm::mat4 &data) {
+  glUniformMatrix4fv(uniforms["MVP"], 1, GL_FALSE, &data[0][0]);
+}
+
+void Shader::setModel (const glm::mat4 &data) {
+  glUniformMatrix4fv(uniforms["Model"], 1, GL_FALSE, &data[0][0]);
+}
+
+void Shader::setView (const glm::mat4 &data) {
+  glUniformMatrix4fv(uniforms["View"], 1, GL_FALSE, &data[0][0]);
+}
+
+void Shader::setLightPosition (const glm::vec3 &data) {
+  glUniform3f(uniforms["LightPosition"], data.x, data.y, data.z);
 }
 
 void Shader::setTexture (const Texture *texture) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture->id());
-  glUniform1i(textureSamplerId, 0);
+  glUniform1i(uniforms["textureSampler"], 0);
 }

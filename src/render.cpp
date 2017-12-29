@@ -15,11 +15,15 @@ void Renderer::clear () const {
 
 void Renderer::drawModel (const Camera *camera, const Model *model) const {
   // 计算模-视矩阵
-  glm::mat4 mvp = camera->getViewProjectionMatrix() * model->modelMatrix();
+  auto MVP = camera->getViewProjectionMatrix() * model->modelMatrix();
 
-  model->shader->use();
-  model->shader->setMvp(mvp);
-  model->shader->setTexture(model->texture);
+  auto shader = model->shader;
+  shader->use();
+  shader->setMVP(MVP);
+  shader->setModel(model->modelMatrix());
+  shader->setView(camera->getViewMatrix());
+  shader->setLightPosition(glm::vec3(4, 4, 4));
+  shader->setTexture(model->texture);
 
   // Vertices
   glEnableVertexAttribArray(0);
