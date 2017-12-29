@@ -28,10 +28,9 @@ public:
   Shader (const char *vshader, const char *fshader);
   ~Shader ();
 
+  void use ();
   GLuint getProgramId () const { return programId; }
 
-  void use ();
-  void setMVP (const glm::mat4 &data);
   void setModel (const glm::mat4 &data);
   void setView (const glm::mat4 &data);
   void setProjection (const glm::mat4 &data);
