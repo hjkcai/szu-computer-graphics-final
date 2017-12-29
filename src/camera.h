@@ -21,10 +21,10 @@ public:
   glm::vec3 at = glm::vec3(0, 0, 0);
   glm::vec3 up = glm::vec3(0, 1, 0);
 
+  Camera ();
+
   void update ();
   glm::mat4 mvp (const glm::mat4 &model) const;
-
-  Camera () = default;
 };
 
 #endif
