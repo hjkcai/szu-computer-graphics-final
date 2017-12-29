@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 
+#include "camera.h"
 #include "model.h"
 
 class Renderer {
@@ -15,7 +16,7 @@ public:
   void setClearParams (const GLbitfield &params);
 
   void clear () const;
-  void drawModel (const Model *model) const;
+  void drawModel (const Camera *camera, const Model *model) const;
 };
 
 #endif

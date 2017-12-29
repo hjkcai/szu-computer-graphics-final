@@ -13,8 +13,10 @@ void Renderer::clear () const {
   glClear(paramsOfClearing);
 }
 
-void Renderer::drawModel (const Model *model) const {
+void Renderer::drawModel (const Camera *camera, const Model *model) const {
   model->shader->use();
+  model->shader->setMvp(camera->mvp(model->modelMatrix()));
+  model->shader->setTexture(model->texture);
 
   // vertices
   glEnableVertexAttribArray(0);
