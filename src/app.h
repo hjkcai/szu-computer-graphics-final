@@ -13,7 +13,9 @@ private:
   Scene *scene;
   Renderer *renderer;
   GLuint vao;
+
   void createWindow (const std::string &title);
+  void initGL ();
 
 public:
   sf::RenderWindow *window;

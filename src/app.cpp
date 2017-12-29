@@ -4,6 +4,8 @@
 
 Application::Application (const std::string &title) {
   createWindow(title);
+  initGL();
+
   renderer = new Renderer();
   scene = new Scene();
 }
@@ -28,14 +30,15 @@ void Application::createWindow (const std::string &title) {
   if (glewInit() != GLEW_OK) {
     std::cout << "Failed to initialize glew" << std::endl;
   }
+}
 
+void Application::initGL () {
   glViewport(0, 0, 600, 600);
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 }
 
 void Application::mainLoop () {
-  glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
   while (window->isOpen()) {
     renderer->clear();
     scene->render(renderer);
