@@ -2,6 +2,7 @@
 #define __CG_SCENE_H__
 
 #include <glm/glm.hpp>
+#include <SFML/Graphics.hpp>
 
 #include "camera.h"
 #include "model.h"
@@ -10,9 +11,11 @@
 
 class Scene {
 private:
-  Model *table;
   Camera *camera;
   Shader *shader;
+
+  Model *table;
+  Model *ground;
 
   struct {
     glm::vec3 position = { 4, 4, 4 };         // 光照位置
@@ -25,6 +28,7 @@ public:
   ~Scene ();
 
   void render (Renderer *renderer);
+  void onKeydown (const sf::Event::KeyEvent &e);
 };
 
 #endif

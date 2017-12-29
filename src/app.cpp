@@ -55,6 +55,10 @@ void Application::handleWindowEvents () {
         window->close();
         break;
 
+      case sf::Event::KeyPressed:
+        scene->onKeydown(e.key);
+        break;
+
       default:
         break;
     }
