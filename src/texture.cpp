@@ -3,7 +3,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-Texture::Texture (const char *file) {
+Texture::Texture (const std::string &file) {
   sf::Image i;
   if (!i.loadFromFile(file)) {
     std::cout << "Unable to load texture file: " << file << std::endl;

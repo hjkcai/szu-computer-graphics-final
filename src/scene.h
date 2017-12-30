@@ -32,20 +32,20 @@ public:
   Camera* getCamera () const { return camera; }
   LightingOptions* getLightingOptions () const { return light; }
 
-  virtual std::vector<ModelDescription> render () const = 0;
+  virtual std::vector<ModelGroup*> getModelGroups () const = 0;
   void onKeydown (const sf::Event::KeyEvent &e) {};
 };
 
 class TableScene : public Scene {
 private:
-  Model *table;
-  Model *ground;
+  ModelGroup *table, *anotherTable;
+  ModelGroup *ground;
 
 public:
   TableScene ();
   ~TableScene ();
 
-  std::vector<ModelDescription> render () const;
+  std::vector<ModelGroup*> getModelGroups () const;
   void onKeydown (const sf::Event::KeyEvent &e);
 };
 

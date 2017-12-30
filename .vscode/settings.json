@@ -41,7 +41,8 @@
     "limits": "cpp",
     "memory": "cpp",
     "ratio": "cpp",
-    "tuple": "cpp"
+    "tuple": "cpp",
+    "ostream": "cpp"
   },
   "cSpell.words": [
     "Luint",

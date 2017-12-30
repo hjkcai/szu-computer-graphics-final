@@ -25,24 +25,28 @@ Scene::~Scene () {
 
 TableScene::TableScene () {
   // 读入模型和纹理，并设置其初始参数
-  table = new Model("models/table.obj", "textures/table.png");
-  table->rotationX = -90;
-  table->y = 0.6736;
-  table->update();
+  table = new ModelGroup("models/table.obj");
+  table->getModels()[0]->setTexture("textures/table.png");
+  table->setRotationX(-90);
+  table->setY(0.6736);
 
-  ground = new Model("models/ground.obj", "textures/ground.jpg");
+  anotherTable = table->clone();
+  anotherTable->setX(2);
+
+  ground = new ModelGroup("models/ground.obj");
+  ground->getModels()[0]->setTexture("textures/ground.jpg");
 }
 
 TableScene::~TableScene () {
   delete table;
-  delete ground;
+  delete anotherTable;
 }
 
-std::vector<ModelDescription> TableScene::render () const {
-  std::vector<ModelDescription> result;
-  result.push_back(table->render());
-  result.push_back(table->render(glm::translate(glm::vec3(2, 0, 0))));
-  result.push_back(ground->render());
+std::vector<ModelGroup*> TableScene::getModelGroups () const {
+  std::vector<ModelGroup*> result;
+  result.push_back(ground);
+  result.push_back(table);
+  result.push_back(anotherTable);
   return result;
 }
 

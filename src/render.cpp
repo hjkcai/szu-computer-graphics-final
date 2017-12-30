@@ -17,26 +17,26 @@ void Renderer::initShadow () {
   depthShader = new DepthShader();
 
   // 生成用于绘制阴影的缓冲区
-	glGenFramebuffers(1, &depthBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, depthBuffer);
+  glGenFramebuffers(1, &depthBuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, depthBuffer);
 
   // 生成用于记录阴影大小的缓冲区
-	glGenTextures(1, &depthTexture);
-	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
+  glGenTextures(1, &depthTexture);
+  glBindTexture(GL_TEXTURE_2D, depthTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
 
-	// 计算阴影时去除颜色数据
-	glDrawBuffer(GL_NONE);
+  // 计算阴影时去除颜色数据
+  glDrawBuffer(GL_NONE);
 
-	// 测试缓冲区是否正常可用
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+  // 测试缓冲区是否正常可用
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
     std::cout << "Failed to init frame buffer" << std::endl;
   }
 }
@@ -63,11 +63,15 @@ void Renderer::renderShadow (const Scene *scene) {
   clear();
 
   depthShader->use();
-  for (auto data : scene->render()) {
-    auto M = data.model->getModelMatrix() * data.transform;
-    auto V = depthViewMatrix = glm::lookAt(scene->getLightingOptions()->position, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-    auto P = depthProjectionMatrix = glm::ortho<float>(-10, 10, -10, 10, -10, 20);
-    drawModel(data.model, depthShader, M, V, P);
+
+  auto V = depthViewMatrix = glm::lookAt(scene->getLightingOptions()->position, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+  auto P = depthProjectionMatrix = glm::ortho<float>(-10, 10, -10, 10, -10, 20);
+
+  for (auto group : scene->getModelGroups()) {
+    for (auto model : group->getModels()) {
+      auto M = group->getModelMatrix() * model->getModelMatrix();
+      drawModel(model, depthShader, M, V, P);
+    }
   }
 }
 
@@ -82,6 +86,7 @@ void Renderer::renderScene (const Scene *scene) {
   shader->use();
 
   // 将阴影数据传入 shader
+  auto depthMatrix = depthBiasMatrix * depthProjectionMatrix * depthViewMatrix;
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, depthTexture);
   shader->setShadowMap(1);
@@ -92,15 +97,19 @@ void Renderer::renderScene (const Scene *scene) {
   shader->setLightPower(scene->getLightingOptions()->power);
   shader->setLightPosition(scene->getLightingOptions()->position);
 
-  for (auto data : scene->render()) {
-    auto M = data.model->getModelMatrix() * data.transform;
-    auto V = scene->getCamera()->getViewMatrix();
-    auto P = scene->getCamera()->getProjectionMatrix();
+  auto V = scene->getCamera()->getViewMatrix();
+  auto P = scene->getCamera()->getProjectionMatrix();
 
-    shader->setTexture(data.model->getTexture());
-    shader->setDepthMatrix(depthBiasMatrix * depthProjectionMatrix * depthViewMatrix * M);
+  for (auto group : scene->getModelGroups()) {
+    for (auto model : group->getModels()) {
+      if (model->getTexture() != NULL) {
+        shader->setTexture(model->getTexture());
+      }
 
-    drawModel(data.model, shader, M, V, P);
+      auto M = group->getModelMatrix() * model->getModelMatrix();
+      shader->setDepthMatrix(depthMatrix * M);
+      drawModel(model, shader, M, V, P);
+    }
   }
 }
 
@@ -126,7 +135,7 @@ void Renderer::drawModel (const Model *model, BasicShader *shader, const glm::ma
   glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
   // 绘制模型
-  glDrawArrays(GL_TRIANGLES, 0, model->getVertices().size());
+  glDrawArrays(GL_TRIANGLES, 0, model->getVertices()->size());
 
   // 清理绘制内容
   glDisableVertexAttribArray(0);

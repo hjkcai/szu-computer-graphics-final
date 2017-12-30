@@ -32,6 +32,7 @@ private:
 
   void renderShadow (const Scene *scene);
   void renderScene (const Scene *scene);
+
   void drawModel (const Model *model, BasicShader *shader, const glm::mat4 &M, const glm::mat4 &V, const glm::mat4 &P);
 
 public:

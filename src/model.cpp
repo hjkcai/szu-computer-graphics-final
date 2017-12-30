@@ -1,124 +1,10 @@
 #include "model.h"
 #include <string>
+#include <iostream>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Model::Model (const std::string &model, const std::string &texture) {
-  loadObj(model.c_str());
-  this->texture = new Texture(texture.c_str());
-
-  init();
-  update();
-}
-
-Model::~Model () {
-  glDeleteBuffers(1, &vBuffer); vBuffer = 0;
-  glDeleteBuffers(1, &uvBuffer); uvBuffer = 0;
-}
-
-void Model::init () {
-  glGenBuffers(1, &vBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
-
-	glGenBuffers(1, &uvBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
-	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
-
-	glGenBuffers(1, &normalBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
-}
-
-void Model::loadObj (const char *path) {
-  std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
-	std::vector<glm::vec3> temp_vertices;
-	std::vector<glm::vec2> temp_uvs;
-	std::vector<glm::vec3> temp_normals;
-
-  vertices.clear();
-  uvs.clear();
-  normals.clear();
-
-  FILE * file = fopen(path, "r");
-  if (file == NULL) {
-    printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
-    getchar();
-    return;
-  }
-
-  while (true) {
-    char lineHeader[128];
-
-    // read the first word of the line
-    int res = fscanf(file, "%s", lineHeader);
-    if (res == EOF) {
-      // EOF = End Of File. Quit the loop.
-      break;
-    }
-
-    // else : parse lineHeader
-    if (strcmp(lineHeader, "v") == 0){
-      glm::vec3 vertex;
-      fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-      temp_vertices.push_back(vertex);
-    } else if (strcmp(lineHeader, "vt") == 0) {
-      glm::vec2 uv;
-      fscanf(file, "%f %f\n", &uv.x, &uv.y);
-      uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
-      temp_uvs.push_back(uv);
-    } else if (strcmp(lineHeader, "vn") == 0) {
-      glm::vec3 normal;
-      fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-      temp_normals.push_back(normal);
-    } else if (strcmp(lineHeader, "f") == 0) {
-      std::string vertex1, vertex2, vertex3;
-      unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-      int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
-      if (matches != 9) {
-        printf("File can't be read by our simple parser :-( Try exporting with other options\n");
-        fclose(file);
-        return;
-      }
-
-      vertexIndices.push_back(vertexIndex[0]);
-      vertexIndices.push_back(vertexIndex[1]);
-      vertexIndices.push_back(vertexIndex[2]);
-      uvIndices    .push_back(uvIndex[0]);
-      uvIndices    .push_back(uvIndex[1]);
-      uvIndices    .push_back(uvIndex[2]);
-      normalIndices.push_back(normalIndex[0]);
-      normalIndices.push_back(normalIndex[1]);
-      normalIndices.push_back(normalIndex[2]);
-    } else {
-      // Probably a comment, eat up the rest of the line
-      char stupidBuffer[1000];
-      fgets(stupidBuffer, 1000, file);
-    }
-  }
-
-  // For each vertex of each triangle
-  for (unsigned int i = 0; i < vertexIndices.size(); i++){
-    // Get the indices of its attributes
-    unsigned int vertexIndex = vertexIndices[i];
-    unsigned int uvIndex = uvIndices[i];
-    unsigned int normalIndex = normalIndices[i];
-
-    // Get the attributes thanks to the index
-    glm::vec3 vertex = temp_vertices[vertexIndex - 1];
-    glm::vec2 uv = temp_uvs[uvIndex - 1];
-    glm::vec3 normal = temp_normals[normalIndex - 1];
-
-    // Put the attributes in buffers
-    vertices.push_back(vertex);
-    uvs     .push_back(uv);
-    normals .push_back(normal);
-  }
-
-  fclose(file);
-}
-
-Model* Model::update () {
+void AbstractModel::update () {
   _modelMatrix =
     // 平移
     glm::translate(glm::mat4(), glm::vec3(x, y, z)) *
@@ -130,14 +16,138 @@ Model* Model::update () {
 
     // 缩放
     glm::scale(glm::vec3(scale));
-
-  return this;
 }
 
-glm::mat4 Model::getModelMatrix () const {
-  return _modelMatrix;
+void AbstractModel::copyFrom (const AbstractModel *model) {
+  scale = model->scale;
+  x = model->x;
+  y = model->y;
+  z = model->z;
+  rotationX = model->rotationX;
+  rotationY = model->rotationY;
+  rotationZ = model->rotationZ;
 }
 
-ModelDescription Model::render (const glm::mat4 &transform) const {
-  return ModelDescription(this, transform);
+Model::Model (): cloned(true) {}
+
+Model::Model (const std::vector<glm::vec3> &theVertices, const std::vector<glm::vec2> &theUVs, const std::vector<glm::vec3> &theNormals) {
+  vertices = new std::vector<glm::vec3>(theVertices);
+  uvs = new std::vector<glm::vec2>(theUVs);
+  normals = new std::vector<glm::vec3>(theNormals);
+
+  init();
+  update();
+}
+
+Model::~Model () {
+  if (!cloned) {
+    delete vertices; vertices = NULL;
+    delete uvs; uvs = NULL;
+    delete normals; normals = NULL;
+
+    if (texture != NULL) {
+      delete texture;
+    }
+
+    glDeleteBuffers(1, &vBuffer); vBuffer = 0;
+    glDeleteBuffers(1, &uvBuffer); uvBuffer = 0;
+    glDeleteBuffers(1, &normalBuffer); normalBuffer = 0;
+  }
+}
+
+void Model::init () {
+  glGenBuffers(1, &vBuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
+  glBufferData(GL_ARRAY_BUFFER, vertices->size() * sizeof(glm::vec3), vertices->data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &uvBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+	glBufferData(GL_ARRAY_BUFFER, uvs->size() * sizeof(glm::vec2), uvs->data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &normalBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+	glBufferData(GL_ARRAY_BUFFER, normals->size() * sizeof(glm::vec3), normals->data(), GL_STATIC_DRAW);
+}
+
+Model* Model::clone () const {
+  Model *clonedModel = new Model();
+  clonedModel->copyFrom(this);
+  clonedModel->vBuffer = vBuffer;
+  clonedModel->uvBuffer = uvBuffer;
+  clonedModel->normalBuffer = normalBuffer;
+  clonedModel->vertices = vertices;
+  clonedModel->uvs = uvs;
+  clonedModel->normals = normals;
+  clonedModel->texture = texture;
+  return clonedModel;
+}
+
+ModelGroup::ModelGroup (): cloned(true) {}
+
+ModelGroup::ModelGroup (const std::string &obj) {
+  loadObj(obj);
+}
+
+ModelGroup::~ModelGroup () {
+  for (auto model : models) {
+    delete model;
+  }
+
+  models.clear();
+}
+
+void ModelGroup::loadObj (const std::string &obj) {
+  tinyobj::attrib_t attrib;
+  std::vector<tinyobj::shape_t> shapes;
+  std::vector<tinyobj::material_t> materials;
+  std::string err;
+
+  bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, obj.c_str());
+  if (!err.empty()) std::cerr << err << std::endl;
+  if (!ret) return;
+
+  for (size_t s = 0; s < shapes.size(); s++) {
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec2> uvs;
+    std::vector<glm::vec3> normals;
+
+    size_t index_offset = 0;
+    for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+      int fv = shapes[s].mesh.num_face_vertices[f];
+
+      for (size_t v = 0; v < fv; v++) {
+        tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+        tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
+        tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
+        tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
+        tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
+        tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
+        tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
+        tinyobj::real_t tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+        tinyobj::real_t ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+
+        // std::cout << vx << '\t' << vy << '\t' << vz << '\t' << nx << '\t' << ny << '\t' << nz << '\t' << tx << '\t' << ty << std::endl;
+        vertices.push_back(glm::vec3(vx, vy, vz));
+        uvs.push_back(glm::vec2(tx, -ty));
+        normals.push_back(glm::vec3(nx, ny, nz));
+      }
+
+      index_offset += fv;
+    }
+
+    std::cout << vertices.size() << std::endl;
+    Model *model = new Model(vertices, uvs, normals);
+    models.push_back(model);
+  }
+}
+
+ModelGroup* ModelGroup::clone () const {
+  ModelGroup *clonedGroup = new ModelGroup();
+  clonedGroup->copyFrom(this);
+
+  for (auto model : models) {
+    clonedGroup->models.push_back(model->clone());
+  }
+
+  return clonedGroup;
 }
