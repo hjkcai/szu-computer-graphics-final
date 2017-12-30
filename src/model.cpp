@@ -26,6 +26,7 @@ void AbstractModel::copyFrom (const AbstractModel *model) {
   rotationX = model->rotationX;
   rotationY = model->rotationY;
   rotationZ = model->rotationZ;
+  update();
 }
 
 Model::Model (): cloned(true) {}
@@ -112,7 +113,7 @@ void ModelGroup::loadObj (const std::string &obj) {
   std::vector<tinyobj::material_t> materials;
   std::string err;
 
-  bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, obj.c_str());
+  bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, obj.c_str(), "models/");
   if (!err.empty()) std::cerr << err << std::endl;
   if (!ret) return;
 
