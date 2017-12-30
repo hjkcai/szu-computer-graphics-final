@@ -97,13 +97,26 @@ void Renderer::renderScene (const Scene *scene) {
   shader->setLightPower(scene->getLightingOptions()->power);
   shader->setLightPosition(scene->getLightingOptions()->position);
 
+  // 从相机中获取 view 和 projection 矩阵
   auto V = scene->getCamera()->getViewMatrix();
   auto P = scene->getCamera()->getProjectionMatrix();
 
+  // 绘制层级模型
   for (auto group : scene->getModelGroups()) {
     for (auto model : group->getModels()) {
       if (model->getTexture() != NULL) {
+        shader->setTextureEnabled(true);
         shader->setTexture(model->getTexture());
+      } else {
+        shader->setTextureEnabled(false);
+
+        auto material = model->getMaterial();
+        if (material != NULL) {
+          shader->setDiffuseColor(glm::vec3(material->diffuse[0], material->diffuse[1], material->diffuse[2]));
+          shader->setSpecularColor(glm::vec3(material->specular[0], material->specular[1], material->specular[2]));
+        } else {
+          shader->setSpecularColor(glm::vec3(0.1, 0.1, 0.1));
+        }
       }
 
       auto M = group->getModelMatrix() * model->getModelMatrix();

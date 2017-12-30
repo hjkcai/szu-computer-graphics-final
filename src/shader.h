@@ -21,6 +21,9 @@
 #define LIGHT_POWER "lightPower"
 #define LIGHT_POSITION "lightPosition"
 
+#define TEXTURE_ENABLED "useTexture"
+#define DIFFUSE_COLOR "materialDiffuseColor"
+#define SPECULAR_COLOR "materialSpecularColor"
 #define TEXTURE_SAMPLER "textureSampler"
 
 // 基础 shader 定义
@@ -59,6 +62,9 @@ public:
   void setLightPower (const float &data);
   void setLightPosition (const glm::vec3 &data);
 
+  void setTextureEnabled (const bool &data);
+  void setDiffuseColor (const glm::vec3 &data);
+  void setSpecularColor (const glm::vec3 &data);
   void setTexture (const Texture *texture);
 };
 

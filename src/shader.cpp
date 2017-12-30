@@ -139,6 +139,9 @@ SceneShader::SceneShader () : BasicShader("shaders/vshader.glsl", "shaders/fshad
   uniforms[LIGHT_COLOR] = glGetUniformLocation(programId, LIGHT_COLOR);
   uniforms[LIGHT_POWER] = glGetUniformLocation(programId, LIGHT_POWER);
   uniforms[LIGHT_POSITION] = glGetUniformLocation(programId, LIGHT_POSITION);
+  uniforms[TEXTURE_ENABLED] = glGetUniformLocation(programId, TEXTURE_ENABLED);
+  uniforms[DIFFUSE_COLOR] = glGetUniformLocation(programId, DIFFUSE_COLOR);
+  uniforms[SPECULAR_COLOR] = glGetUniformLocation(programId, SPECULAR_COLOR);
   uniforms[TEXTURE_SAMPLER] = glGetUniformLocation(programId, TEXTURE_SAMPLER);
 }
 
@@ -164,6 +167,18 @@ void SceneShader::setLightPower (const float &data) {
 
 void SceneShader::setLightPosition (const glm::vec3 &data) {
   glUniform3f(uniforms[LIGHT_POSITION], data.x, data.y, data.z);
+}
+
+void SceneShader::setTextureEnabled (const bool &data) {
+  glUniform1i(uniforms[TEXTURE_ENABLED], data);
+}
+
+void SceneShader::setDiffuseColor (const glm::vec3 &data) {
+  glUniform3f(uniforms[DIFFUSE_COLOR], data.x, data.y, data.z);
+}
+
+void SceneShader::setSpecularColor (const glm::vec3 &data) {
+  glUniform3f(uniforms[SPECULAR_COLOR], data.x, data.y, data.z);
 }
 
 void SceneShader::setTexture (const Texture *texture) {
