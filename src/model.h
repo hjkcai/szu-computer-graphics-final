@@ -55,13 +55,14 @@ private:
   std::vector<glm::vec2> *uvs = NULL;
   std::vector<glm::vec3> *normals = NULL;
 
+  tinyobj::material_t *material = NULL;
   Texture *texture = NULL;
 
   Model ();
   void init ();
 
 public:
-  Model (const std::vector<glm::vec3> &theVertices, const std::vector<glm::vec2> &theUVs, const std::vector<glm::vec3> &theNormals);
+  Model (const std::vector<glm::vec3> &theVertices, const std::vector<glm::vec2> &theUVs, const std::vector<glm::vec3> &theNormals, tinyobj::material_t *theMaterial = NULL);
   ~Model ();
 
   Model* clone () const;
@@ -79,6 +80,8 @@ public:
     if (texture != NULL) delete texture;
     texture = new Texture(path);
   }
+
+  tinyobj::material_t* getMaterial () { return material; }
 };
 
 class ModelGroup : public AbstractModel {

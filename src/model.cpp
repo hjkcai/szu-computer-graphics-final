@@ -30,10 +30,16 @@ void AbstractModel::copyFrom (const AbstractModel *model) {
 
 Model::Model (): cloned(true) {}
 
-Model::Model (const std::vector<glm::vec3> &theVertices, const std::vector<glm::vec2> &theUVs, const std::vector<glm::vec3> &theNormals) {
+Model::Model (
+  const std::vector<glm::vec3> &theVertices,
+  const std::vector<glm::vec2> &theUVs,
+  const std::vector<glm::vec3> &theNormals,
+  tinyobj::material_t *theMaterial
+) {
   vertices = new std::vector<glm::vec3>(theVertices);
   uvs = new std::vector<glm::vec2>(theUVs);
   normals = new std::vector<glm::vec3>(theNormals);
+  material = theMaterial;
 
   init();
   update();
@@ -45,9 +51,8 @@ Model::~Model () {
     delete uvs; uvs = NULL;
     delete normals; normals = NULL;
 
-    if (texture != NULL) {
-      delete texture;
-    }
+    if (texture != NULL) delete texture;
+    if (material != NULL) delete material;
 
     glDeleteBuffers(1, &vBuffer); vBuffer = 0;
     glDeleteBuffers(1, &uvBuffer); uvBuffer = 0;
@@ -78,6 +83,7 @@ Model* Model::clone () const {
   clonedModel->vertices = vertices;
   clonedModel->uvs = uvs;
   clonedModel->normals = normals;
+  clonedModel->material = material;
   clonedModel->texture = texture;
   return clonedModel;
 }
@@ -111,33 +117,52 @@ void ModelGroup::loadObj (const std::string &obj) {
     std::vector<glm::vec2> uvs;
     std::vector<glm::vec3> normals;
 
-    size_t index_offset = 0;
-    for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-      int fv = shapes[s].mesh.num_face_vertices[f];
+    size_t offset = 0;
+    int lastMaterial = shapes[0].mesh.material_ids[0];
 
+    for (size_t f = 0, l = shapes[s].mesh.num_face_vertices.size(); f <= l; f++) {
+      if (shapes[s].mesh.material_ids[f] != lastMaterial || f == l) {
+        tinyobj::material_t *material = NULL;
+        if (lastMaterial != -1) {
+          material = new tinyobj::material_t(materials[lastMaterial]);
+        }
+
+        Model *model = new Model(vertices, uvs, normals, material);
+        models.push_back(model);
+
+        if (f == l) break;
+        else {
+          vertices.clear();
+          uvs.clear();
+          normals.clear();
+        }
+      }
+
+      int fv = shapes[s].mesh.num_face_vertices[f];
       for (size_t v = 0; v < fv; v++) {
-        tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+        tinyobj::index_t idx = shapes[s].mesh.indices[offset + v];
         tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
         tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
         tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
+        vertices.push_back(glm::vec3(vx, vy, vz));
+
         tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
         tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
         tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
-        tinyobj::real_t tx = attrib.texcoords[2 * idx.texcoord_index + 0];
-        tinyobj::real_t ty = attrib.texcoords[2 * idx.texcoord_index + 1];
-
-        // std::cout << vx << '\t' << vy << '\t' << vz << '\t' << nx << '\t' << ny << '\t' << nz << '\t' << tx << '\t' << ty << std::endl;
-        vertices.push_back(glm::vec3(vx, vy, vz));
-        uvs.push_back(glm::vec2(tx, -ty));
         normals.push_back(glm::vec3(nx, ny, nz));
+
+        if (idx.texcoord_index != -1) {
+          tinyobj::real_t tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+          tinyobj::real_t ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+          uvs.push_back(glm::vec2(tx, -ty));
+        } else {
+          uvs.push_back(glm::vec2(0, 0));
+        }
       }
 
-      index_offset += fv;
+      offset += fv;
+      lastMaterial = shapes[s].mesh.material_ids[f];
     }
-
-    std::cout << vertices.size() << std::endl;
-    Model *model = new Model(vertices, uvs, normals);
-    models.push_back(model);
   }
 }
 
