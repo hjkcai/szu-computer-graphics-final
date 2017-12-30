@@ -1,11 +1,12 @@
 #version 330 core
 
-// Input vertex data, different for all executions of this shader.
-layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 0) in vec3 vPosition;   // 模型坐标系
 
-// Values that stay constant for the whole mesh.
-uniform mat4 depthMVP;
+uniform mat4 model;           // 模型变换
+uniform mat4 view;            // 旋转整个视图，使得在相机坐标系中，光照方向为 -Z
+uniform mat4 projection;      // 一个包含整个绘制场景的投影矩阵
 
 void main () {
-  gl_Position =  depthMVP * vec4(vertexPosition_modelspace,1);
+  mat4 depthMVP = projection * view * model;
+  gl_Position = depthMVP * vec4(vPosition, 1);
 }

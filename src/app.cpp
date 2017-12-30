@@ -7,7 +7,7 @@ Application::Application (const std::string &title) {
   initGL();
 
   renderer = new Renderer();
-  scene = new Scene();
+  scene = new TableScene();
 }
 
 Application::~Application () {
@@ -40,8 +40,7 @@ void Application::initGL () {
 
 void Application::mainLoop () {
   while (window->isOpen()) {
-    renderer->clear();
-    renderer->renderScene(scene);
+    renderer->render(scene);
     window->display();
     handleWindowEvents();
   }

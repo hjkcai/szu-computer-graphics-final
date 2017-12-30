@@ -10,7 +10,7 @@
 
 class Application {
 private:
-  Scene *scene;
+  TableScene *scene;
   Renderer *renderer;
   GLuint vao;
 

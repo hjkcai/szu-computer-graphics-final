@@ -137,3 +137,7 @@ Model* Model::update () {
 glm::mat4 Model::getModelMatrix () const {
   return _modelMatrix;
 }
+
+ModelDescription Model::render (const glm::mat4 &transform) const {
+  return ModelDescription(this, transform);
+}

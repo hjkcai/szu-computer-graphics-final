@@ -4,41 +4,40 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-GLuint FramebufferName = 0;
-GLuint depthTexture;
-Scene *_scene;
-
 Renderer::Renderer () {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
+  shader = new SceneShader();
+  initShadow();
+}
+
+void Renderer::initShadow () {
   glEnable(GL_CULL_FACE);
-  depthShader = new Shader("shaders/depth-vshader.glsl", "shaders/depth-fshader.glsl");
+  depthShader = new DepthShader();
 
-  // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-	glGenFramebuffers(1, &FramebufferName);
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+  // 生成用于绘制阴影的缓冲区
+	glGenFramebuffers(1, &depthBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthBuffer);
 
-  // Depth texture. Slower than a depth buffer, but you can sample it later in your shader
+  // 生成用于记录阴影大小的缓冲区
 	glGenTextures(1, &depthTexture);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT16, 1024, 1024, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
 
-	// No color output in the bound framebuffer, only depth.
+	// 计算阴影时去除颜色数据
 	glDrawBuffer(GL_NONE);
 
-	// Always check that our framebuffer is ok
+	// 测试缓冲区是否正常可用
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
     std::cout << "Failed to init frame buffer" << std::endl;
-    return;
   }
 }
 
@@ -50,80 +49,66 @@ void Renderer::setClearParams (const GLbitfield &params) {
   paramsOfClearing = params;
 }
 
-void Renderer::renderScene (Scene *scene) {
-  _scene = scene;
-
-  // Render to our framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-  glViewport(0,0,1024,1024); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-
-  // We don't use bias in the shader, but instead we draw back faces,
-  // which are already separated from the front faces by a small distance
-  // (if your geometry is made this way)
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK); // Cull back-facing triangles -> draw only front-facing triangles
-
-  clear();
-  depthShader->use();
-
-  // Render the scene
-  scene->render(this);
-
-  // Render to the screen
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glViewport(0, 0, 600, 600); // Render on the whole framebuffer, complete from the lower left corner to the upper right
-
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK); // Cull back-facing triangles -> draw only front-facing triangles
-
-  clear();
-  scene->shader->use();
-
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, depthTexture);
-
-	GLuint ShadowMapID = glGetUniformLocation(scene->shader->getProgramId(), "shadowMap");
-  glUniform1i(ShadowMapID, 1);
-
-  scene->render(this);
+void Renderer::render (const Scene *scene) {
+  renderShadow(scene);
+  renderScene(scene);
 }
 
-void Renderer::drawModel (const Model *model, const Camera *camera, Shader *shader, const glm::mat4 &transform) const {
+void Renderer::renderShadow (const Scene *scene) {
+  // 把相机位置移动到光源位置，渲染整个场景，从而计算出阴影位置
+  glBindFramebuffer(GL_FRAMEBUFFER, depthBuffer);
+  glViewport(0, 0, DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  clear();
+
+  depthShader->use();
+  for (auto data : scene->render()) {
+    auto M = data.model->getModelMatrix() * data.transform;
+    auto V = depthViewMatrix = glm::lookAt(scene->getLightingOptions()->position, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    auto P = depthProjectionMatrix = glm::ortho<float>(-10, 10, -10, 10, -10, 20);
+    drawModel(data.model, depthShader, M, V, P);
+  }
+}
+
+void Renderer::renderScene (const Scene *scene) {
+  // 然后按正常方式，渲染整个场景
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  glViewport(0, 0, 600, 600);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  clear();
+
+  shader->use();
+
+  // 将阴影数据传入 shader
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, depthTexture);
+  shader->setShadowMap(1);
+
+  // 将光照数据传入 shader
+  shader->setLightingEnabled(true);
+  shader->setLightColor(scene->getLightingOptions()->color);
+  shader->setLightPower(scene->getLightingOptions()->power);
+  shader->setLightPosition(scene->getLightingOptions()->position);
+
+  for (auto data : scene->render()) {
+    auto M = data.model->getModelMatrix() * data.transform;
+    auto V = scene->getCamera()->getViewMatrix();
+    auto P = scene->getCamera()->getProjectionMatrix();
+
+    shader->setTexture(data.model->getTexture());
+    shader->setDepthMatrix(depthBiasMatrix * depthProjectionMatrix * depthViewMatrix * M);
+
+    drawModel(data.model, shader, M, V, P);
+  }
+}
+
+void Renderer::drawModel (const Model *model, BasicShader *shader, const glm::mat4 &M, const glm::mat4 &V, const glm::mat4 &P) {
   // 设置 shader 参数
-  shader->setModel(model->getModelMatrix() * transform);
-  shader->setView(camera->getViewMatrix());
-  shader->setProjection(camera->getProjectionMatrix());
-  shader->setTexture(model->texture);
-
-  glm::vec3 lightInvDir = _scene->light.position;
-  // Compute the MVP matrix from the light's point of view
-  glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
-  glm::mat4 depthViewMatrix = glm::lookAt(lightInvDir, glm::vec3(0,0,0), glm::vec3(0,1,0));
-  // or, for spot light :
-  //glm::vec3 lightPos(5, 20, 20);
-  //glm::mat4 depthProjectionMatrix = glm::perspective<float>(45.0f, 1.0f, 2.0f, 50.0f);
-  //glm::mat4 depthViewMatrix = glm::lookAt(lightPos, lightPos-lightInvDir, glm::vec3(0,1,0));
-
-  glm::mat4 depthModelMatrix = model->getModelMatrix() * transform;
-  glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
-
-  // Send our transformation to the currently bound shader,
-  // in the "MVP" uniform
-  GLuint depthMatrixID = glGetUniformLocation(depthShader->getProgramId(), "depthMVP");
-  glUniformMatrix4fv(depthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
-
-  glm::mat4 biasMatrix(
-    0.5, 0.0, 0.0, 0.0,
-    0.0, 0.5, 0.0, 0.0,
-    0.0, 0.0, 0.5, 0.0,
-    0.5, 0.5, 0.5, 1.0
-  );
-
-  glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
-  // Send our transformation to the currently bound shader,
-  // in the "MVP" uniform
-	GLuint DepthBiasID = glGetUniformLocation(_scene->shader->getProgramId(), "DepthBiasMVP");
-  glUniformMatrix4fv(DepthBiasID, 1, GL_FALSE, &depthBiasMVP[0][0]);
+  shader->setModel(M);
+  shader->setView(V);
+  shader->setProjection(P);
 
   // 绑定顶点数据
   glEnableVertexAttribArray(0);
