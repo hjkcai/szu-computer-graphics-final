@@ -124,9 +124,9 @@ Model* Model::update () {
     glm::translate(glm::mat4(), glm::vec3(x, y, z)) *
 
     // 旋转
-    glm::rotate(rotationX, glm::vec3(1, 0, 0)) *
-    glm::rotate(rotationY, glm::vec3(0, 1, 0)) *
-    glm::rotate(rotationZ, glm::vec3(0, 0, 1)) *
+    glm::rotate(glm::radians(rotationX), glm::vec3(1, 0, 0)) *
+    glm::rotate(glm::radians(rotationY), glm::vec3(0, 1, 0)) *
+    glm::rotate(glm::radians(rotationZ), glm::vec3(0, 0, 1)) *
 
     // 缩放
     glm::scale(glm::vec3(scale));
