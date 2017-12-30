@@ -24,6 +24,7 @@ class Scene {
 protected:
   Camera *camera;
   LightingOptions *light;
+  std::vector<ModelGroup*> modelGroups;
 
 public:
   Scene ();
@@ -31,23 +32,9 @@ public:
 
   Camera* getCamera () const { return camera; }
   LightingOptions* getLightingOptions () const { return light; }
+  std::vector<ModelGroup*> getModelGroups () const { return modelGroups; }
 
-  virtual std::vector<ModelGroup*> getModelGroups () const = 0;
-  void onKeydown (const sf::Event::KeyEvent &e) {};
-};
-
-class TableScene : public Scene {
-private:
-  ModelGroup *table, *anotherTable;
-  ModelGroup *ground;
-  ModelGroup *tree;
-
-public:
-  TableScene ();
-  ~TableScene ();
-
-  std::vector<ModelGroup*> getModelGroups () const;
-  void onKeydown (const sf::Event::KeyEvent &e);
+  virtual void onKeydown (const sf::Event::KeyEvent &e) = 0;
 };
 
 #endif

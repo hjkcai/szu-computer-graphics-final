@@ -10,8 +10,8 @@
 
 class Application {
 private:
-  TableScene *scene;
-  Renderer *renderer;
+  Scene *scene = NULL;
+  Renderer *renderer = NULL;
   GLuint vao;
 
   void createWindow (const std::string &title);
@@ -23,7 +23,7 @@ public:
   Application (const std::string &title);
   ~Application ();
 
-  void mainLoop ();
+  void run (Scene *theScene);
   void handleWindowEvents ();
 };
 

@@ -7,7 +7,6 @@ Application::Application (const std::string &title) {
   initGL();
 
   renderer = new Renderer();
-  scene = new TableScene();
 }
 
 Application::~Application () {
@@ -38,7 +37,9 @@ void Application::initGL () {
   glBindVertexArray(vao);
 }
 
-void Application::mainLoop () {
+void Application::run (Scene *theScene) {
+  scene = theScene;
+
   while (window->isOpen()) {
     renderer->render(scene);
     window->display();
