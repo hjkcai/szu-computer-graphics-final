@@ -40,6 +40,7 @@ class TableScene : public Scene {
 private:
   ModelGroup *table, *anotherTable;
   ModelGroup *ground;
+  ModelGroup *tree;
 
 public:
   TableScene ();

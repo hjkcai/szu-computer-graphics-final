@@ -29,17 +29,25 @@ TableScene::TableScene () {
   table->getModels()[0]->setTexture("textures/table.png");
   table->setRotationX(-90);
   table->setY(0.6736);
+  table->setZ(-2);
 
   anotherTable = table->clone();
   anotherTable->setX(2);
+  anotherTable->setZ(0);
 
   ground = new ModelGroup("models/ground.obj");
   ground->getModels()[0]->setTexture("textures/ground.jpg");
+
+  tree = new ModelGroup("models/tree.obj");
+  tree->setScale(0.5);
+  tree->setY(0.947804);
 }
 
 TableScene::~TableScene () {
   delete table;
   delete anotherTable;
+  delete ground;
+  delete tree;
 }
 
 std::vector<ModelGroup*> TableScene::getModelGroups () const {
@@ -47,6 +55,7 @@ std::vector<ModelGroup*> TableScene::getModelGroups () const {
   result.push_back(ground);
   result.push_back(table);
   result.push_back(anotherTable);
+  result.push_back(tree);
   return result;
 }
 
@@ -67,6 +76,4 @@ void TableScene::onKeydown (const sf::Event::KeyEvent &e) {
     default:
       break;
   }
-
-  // std::cout << light->position.x << '\t' << light->position.y << '\t' << light->position.z << std::endl;
 }

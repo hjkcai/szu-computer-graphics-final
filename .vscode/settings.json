@@ -42,7 +42,10 @@
     "memory": "cpp",
     "ratio": "cpp",
     "tuple": "cpp",
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "atomic": "cpp",
+    "system_error": "cpp",
+    "*.ipp": "cpp"
   },
   "cSpell.words": [
     "Luint",
