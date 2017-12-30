@@ -43,6 +43,10 @@ Model::Model (
 
   init();
   update();
+
+  if (material != NULL && !material->diffuse_texname.empty()) {
+    setTexture(material->diffuse_texname);
+  }
 }
 
 Model::~Model () {
