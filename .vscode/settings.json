@@ -32,7 +32,16 @@
     "__locale": "cpp",
     "type_traits": "cpp",
     "cctype": "cpp",
-    "cstddef": "cpp"
+    "cstddef": "cpp",
+    "__functional_base": "cpp",
+    "__functional_base_03": "cpp",
+    "__tuple": "cpp",
+    "chrono": "cpp",
+    "functional": "cpp",
+    "limits": "cpp",
+    "memory": "cpp",
+    "ratio": "cpp",
+    "tuple": "cpp"
   },
   "cSpell.words": [
     "Luint",

@@ -12,11 +12,12 @@
 class Renderer;
 class Scene {
 private:
-  Camera *camera;
-  Shader *shader;
-
   Model *table;
   Model *ground;
+
+public:
+  Camera *camera;
+  Shader *shader;
 
   struct {
     glm::vec3 position = { 4, 4, 4 };         // 光照位置
@@ -24,7 +25,6 @@ private:
     float power = 50;                         // 光照强度
   } light;
 
-public:
   Scene ();
   ~Scene ();
 

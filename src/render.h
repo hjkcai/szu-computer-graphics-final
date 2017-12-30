@@ -13,6 +13,7 @@ class Scene;
 class Renderer {
 private:
   GLbitfield paramsOfClearing = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+  Shader *depthShader;
 
 public:
   Renderer ();

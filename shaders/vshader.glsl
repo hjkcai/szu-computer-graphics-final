@@ -8,12 +8,14 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform vec3 lightPosition;     // 世界坐标系
+uniform mat4 DepthBiasMVP;
 
 out vec2 UV;
 out vec3 vPosition_world;       // 世界坐标系
 out vec3 vNormal_camera;        // 相机坐标系
 out vec3 eyeDirection;    			// 相机坐标系
 out vec3 lightDirection;  			// 相机坐标系
+out vec4 ShadowCoord;
 
 void main () {
   // 顶点位置
@@ -34,4 +36,6 @@ void main () {
 
 	// 贴图位置
   UV = vertexUV;
+
+	ShadowCoord = DepthBiasMVP * vec4(vPosition, 1);
 }
