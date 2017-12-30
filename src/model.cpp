@@ -150,10 +150,14 @@ void ModelGroup::loadObj (const std::string &obj) {
         tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
         vertices.push_back(glm::vec3(vx, vy, vz));
 
-        tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
-        tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
-        tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
-        normals.push_back(glm::vec3(nx, ny, nz));
+        if (idx.normal_index != -1) {
+          tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
+          tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
+          tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
+          normals.push_back(glm::vec3(nx, ny, nz));
+        } else {
+          normals.push_back(glm::vec3(0, 0, 0));
+        }
 
         if (idx.texcoord_index != -1) {
           tinyobj::real_t tx = attrib.texcoords[2 * idx.texcoord_index + 0];
