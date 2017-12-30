@@ -108,6 +108,7 @@ void Shader::initUniforms () {
   uniforms[MODEL_MATRIX] = glGetUniformLocation(programId, MODEL_MATRIX);
   uniforms[VIEW_MATRIX] = glGetUniformLocation(programId, VIEW_MATRIX);
   uniforms[PROJ_MATRIX] = glGetUniformLocation(programId, PROJ_MATRIX);
+  uniforms[LIGHTING_ENABLED] = glGetUniformLocation(programId, LIGHTING_ENABLED);
   uniforms[LIGHT_COLOR] = glGetUniformLocation(programId, LIGHT_COLOR);
   uniforms[LIGHT_POWER] = glGetUniformLocation(programId, LIGHT_POWER);
   uniforms[LIGHT_POSITION] = glGetUniformLocation(programId, LIGHT_POSITION);
@@ -128,6 +129,10 @@ void Shader::setView (const glm::mat4 &data) {
 
 void Shader::setProjection (const glm::mat4 &data) {
   glUniformMatrix4fv(uniforms[PROJ_MATRIX], 1, GL_FALSE, &data[0][0]);
+}
+
+void Shader::setLightingEnabled (const bool &data) {
+  glUniform1i(uniforms[LIGHTING_ENABLED], data);
 }
 
 void Shader::setLightColor (const glm::vec3 &data) {

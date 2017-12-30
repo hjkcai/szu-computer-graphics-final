@@ -1,6 +1,9 @@
 #include "scene.h"
 #include "texture.h"
+
 #include <iostream>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 Scene::Scene () {
   // 设置场景背景色
@@ -16,8 +19,8 @@ Scene::Scene () {
 
   // 初始化相机参数
   camera = new Camera();
-  camera->up = glm::vec3(0, 0.001, 0);
-  camera->eye = glm::vec3(0, 4, 4);
+  camera->up = glm::vec3(0, 1, 0);
+  camera->eye = glm::vec3(4, 1, 4);
   camera->update();
 
   // 初始化 Shader
@@ -41,40 +44,38 @@ void Scene::render (Renderer *renderer) {
   shader->setLightPosition(light.position);
 
   // 绘制模型
+  shader->setLightingEnabled(true);
   renderer->drawModel(table, camera, shader);
+  renderer->drawModel(table, camera, shader, glm::translate(glm::vec3(2, 0, 0)));
+
+  // 绘制地面
+  shader->setLightingEnabled(false);
   renderer->drawModel(ground, camera, shader);
 }
 
 void Scene::onKeydown (const sf::Event::KeyEvent &e) {
   switch (e.code) {
-    case sf::Keyboard::W:
-      camera->up.y += 0.001;
+    case sf::Keyboard::X:
+      camera->eye.x += e.shift ? 0.1 : -0.1;
       break;
 
-    case sf::Keyboard::S:
-      camera->up.y -= 0.001;
+    case sf::Keyboard::Y:
+      camera->eye.y += e.shift ? 0.1 : -0.1;
       break;
 
-    case sf::Keyboard::E:
-      camera->up.x += 0.001;
-      break;
-
-    case sf::Keyboard::Q:
-      camera->up.x -= 0.001;
-      break;
-
-    case sf::Keyboard::D:
-      camera->up.z += 0.001;
+    case sf::Keyboard::Z:
+      camera->eye.z += e.shift ? 0.1 : -0.1;
       break;
 
     case sf::Keyboard::A:
-      camera->up.z -= 0.001;
+      table->y += e.shift ? 0.01 : -0.01;
+      table->update();
+      std::cout << table->y << std::endl;
       break;
 
     default:
       break;
   }
 
-  std::cout << camera->up.x << '\t' << camera->up.y << '\t' << camera->up.z << '\t' << std::endl;
   camera->update();
 }
