@@ -5,12 +5,16 @@ Renderer::Renderer () {
   glDepthFunc(GL_LESS);
 }
 
+void Renderer::clear () const {
+  glClear(paramsOfClearing);
+}
+
 void Renderer::setClearParams (const GLbitfield &params) {
   paramsOfClearing = params;
 }
 
-void Renderer::clear () const {
-  glClear(paramsOfClearing);
+void Renderer::renderScene (Scene *scene) {
+  scene->render(this);
 }
 
 void Renderer::drawModel (const Model *model, const Camera *camera, Shader *shader, const glm::mat4 &transform) const {

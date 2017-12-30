@@ -6,8 +6,10 @@
 
 #include "camera.h"
 #include "model.h"
+#include "scene.h"
 #include "shader.h"
 
+class Scene;
 class Renderer {
 private:
   GLbitfield paramsOfClearing = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
@@ -15,9 +17,10 @@ private:
 public:
   Renderer ();
 
+  void clear () const;
   void setClearParams (const GLbitfield &params);
 
-  void clear () const;
+  void renderScene (Scene *scene);
   void drawModel (const Model *model, const Camera *camera, Shader *shader, const glm::mat4 &transform = glm::mat4(1)) const;
 };
 

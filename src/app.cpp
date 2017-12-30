@@ -41,7 +41,7 @@ void Application::initGL () {
 void Application::mainLoop () {
   while (window->isOpen()) {
     renderer->clear();
-    scene->render(renderer);
+    renderer->renderScene(scene);
     window->display();
     handleWindowEvents();
   }

@@ -9,6 +9,7 @@
 #include "render.h"
 #include "shader.h"
 
+class Renderer;
 class Scene {
 private:
   Camera *camera;
