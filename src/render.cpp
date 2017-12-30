@@ -13,10 +13,10 @@ void Renderer::clear () const {
   glClear(paramsOfClearing);
 }
 
-void Renderer::drawModel (const Model *model, const Camera *camera, Shader *shader) const {
+void Renderer::drawModel (const Model *model, const Camera *camera, Shader *shader, const glm::mat4 &transform) const {
   // 设置 shader 参数
   shader->use();
-  shader->setModel(model->getModelMatrix());
+  shader->setModel(model->getModelMatrix() * transform);
   shader->setView(camera->getViewMatrix());
   shader->setProjection(camera->getProjectionMatrix());
   shader->setLightPosition(glm::vec3(4, 4, 4));
