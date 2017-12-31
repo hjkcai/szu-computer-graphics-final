@@ -22,7 +22,7 @@ void Application::createWindow (const std::string &title) {
   settings.stencilBits = 8;
 
   window = new sf::RenderWindow();
-  window->create(sf::VideoMode(1024, 768), title.c_str(), sf::Style::Close, settings);
+  window->create(sf::VideoMode(800, 600), title.c_str(), sf::Style::Close, settings);
   window->setVerticalSyncEnabled(true);
 
   glewExperimental = GL_TRUE;
