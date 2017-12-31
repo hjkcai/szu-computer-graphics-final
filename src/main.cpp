@@ -96,7 +96,7 @@ private:
   Car* car;
 
   // 相机到汽车的位置差
-  glm::vec3 eyeToCar = glm::vec3(-8, 6, -8);
+  glm::vec3 eyeToCar = glm::vec3(-5, 3.5, -5);
 
   // 相机到视点的位置差
   glm::vec3 atToEye = glm::vec3(26, -14, 26);
@@ -107,6 +107,10 @@ private:
   const float acceleration = 0.5;         // 加速度
   const float wheelSpeed = 8;             // 车轮旋转速度
   const float cameraRotationSpeed = 1;    // 额外的视角旋转速度
+
+  const float treeScale = 0.5;            // 树木缩放
+  const float grassScale = 0.8;           // 草缩放
+  const float carScale = 0.3;             // 汽车缩放
 
 public:
   MyScene () {
@@ -146,26 +150,32 @@ public:
   // 读入模型和纹理，并设置其初始参数
   void initModels () {
     auto tree1 = new ModelGroup("models/tree-1.obj");
+    tree1->setScale(treeScale);
     setModelPos(tree1, 0, 1.895607, 0);
     trees.push_back(tree1);
 
     auto tree2 = new ModelGroup("models/tree-2.obj");
+    tree2->setScale(treeScale);
     setModelPos(tree2, 0, 1, 0);
     trees.push_back(tree2);
 
     auto grass1 = new ModelGroup("models/wild-grasses-1.obj");
+    grass1->setScale(grassScale);
     setModelPos(grass1, -0.62, -0.035, -0.514);
     grasses.push_back(grass1);
 
     auto grass2 = new ModelGroup("models/wild-grasses-2.obj");
+    grass2->setScale(grassScale);
     setModelPos(grass2, 0.51, 0.107, 0.369);
     grasses.push_back(grass2);
 
     auto grass3 = new ModelGroup("models/wild-grasses-3.obj");
+    grass3->setScale(grassScale);
     setModelPos(grass3, 0.515, -0.045, -0.503);
     grasses.push_back(grass3);
 
     car = new Car();
+    car->setScale(carScale);
 
     ground = new ModelGroup("models/ground.obj");
     ground->getModels()[0]->setTexture("models/ground.jpg");
@@ -184,11 +194,10 @@ public:
     for (int i = 0; i < 1000; i++) {
       auto grass = grasses[i % grasses.size()]->clone();
       grass->setPosition(generatePoint());
-      grass->setScale(1.5);
       modelGroups.push_back(grass);
     }
 
-    car->setScale(0.5);
+    // 加入汽车
     car->setZ(-18);
     modelGroups.push_back(car);
 
