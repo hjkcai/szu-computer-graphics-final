@@ -6,7 +6,7 @@
 
 // 汽车模型
 class Car : public ModelGroup {
-private:
+protected:
   // 左前轮和右前轮与原点的位置差
   float dxl = 1.71324, dyl = -1.10560, dzl = -1.03662;
   float dxr = 1.73005, dyr = -1.10560, dzr = 1.11338;
@@ -14,9 +14,8 @@ private:
   // 左前轮和右前轮的旋转角度
   float r = 0;
 
-protected:
   const float friction = 0.3;             // 摩擦大小
-  const float wheelBack = 3;              // 车轮回正速度
+  const float wheelBack = 4;              // 车轮回正速度
   const float maxVelocity = 20;           // 最大速度
   const float maxNegativeVelocity = -8;   // 最大倒车速度
   const float maxWheelAngle = 45;         // 车轮最大旋转角度
@@ -81,7 +80,7 @@ public:
     z += cosDir * velocity / 100;
 
     // 计算车身和车轮方向
-    direction = direction - 0.05 * (velocity / maxVelocity) * r;
+    direction = direction - 0.03 * (velocity / maxVelocity) * r;
     r = glm::clamp(shift(r, wheelBack), -maxWheelAngle, maxWheelAngle);
 
     update();
