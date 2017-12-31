@@ -15,9 +15,11 @@ private:
   float r = 0;
 
 protected:
-  const float friction = 0.3;       // 摩擦大小
-  const float wheelBack = 3;        // 车轮回正速度
-  const float maxVelocity = 20;     // 最大速度
+  const float friction = 0.3;             // 摩擦大小
+  const float wheelBack = 3;              // 车轮回正速度
+  const float maxVelocity = 20;           // 最大速度
+  const float maxNegativeVelocity = -8;   // 最大倒车速度
+  const float maxWheelAngle = 45;         // 车轮最大旋转角度
 
   void update () {
     ModelGroup::update();
@@ -46,7 +48,7 @@ protected:
   }
 
   float shift (const float &value, const float &amount) {
-    if (glm::abs(value) < 1e-3) return 0;
+    if (glm::abs(value) < 0.1) return 0;
     else if (value > 0) return value - amount;
     else if (value < 0) return value + amount;
     else return value;
@@ -73,14 +75,14 @@ public:
     auto cosDir = glm::cos(glm::radians(direction));
 
     velocity = shift(velocity + acceleration, friction);
-    velocity = glm::clamp(velocity + acceleration, -8.0f, 20.0f);
+    velocity = glm::clamp(velocity + acceleration, maxNegativeVelocity, maxVelocity);
 
     x += sinDir * velocity / 100;
     z += cosDir * velocity / 100;
 
     // 计算车身和车轮方向
     direction = direction - 0.05 * (velocity / maxVelocity) * r;
-    r = glm::clamp(shift(r, wheelBack), -45.0f, 45.0f);
+    r = glm::clamp(shift(r, wheelBack), -maxWheelAngle, maxWheelAngle);
 
     update();
   }
