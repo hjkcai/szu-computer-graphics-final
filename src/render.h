@@ -10,10 +10,14 @@
 #include "shader.h"
 
 class Scene;
+
 class Renderer {
 private:
   SceneShader *shader;
   GLbitfield paramsOfClearing = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+
+  // 窗口参数
+  float renderSize, offsetX, offsetY;
 
   // 阴影绘制参数
   DepthShader *depthShader;
@@ -36,7 +40,7 @@ private:
   void drawModel (const Model *model, BasicShader *shader, const glm::mat4 &M, const glm::mat4 &V, const glm::mat4 &P);
 
 public:
-  Renderer ();
+  Renderer (const float &w, const float &h);
 
   void clear () const;
   void setClearParams (const GLbitfield &params);

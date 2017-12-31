@@ -6,7 +6,7 @@ Application::Application (const std::string &title) {
   createWindow(title);
   initGL();
 
-  renderer = new Renderer();
+  renderer = new Renderer(window->getSize().x, window->getSize().y);
 }
 
 Application::~Application () {
@@ -22,8 +22,7 @@ void Application::createWindow (const std::string &title) {
   settings.stencilBits = 8;
 
   window = new sf::RenderWindow();
-  window->create({ 600, 600 }, title.c_str(), sf::Style::Close, settings);
-  window->setFramerateLimit(60);
+  window->create(sf::VideoMode(1024, 768), title.c_str(), sf::Style::Close, settings);
 
   glewExperimental = GL_TRUE;
   if (glewInit() != GLEW_OK) {
@@ -32,7 +31,6 @@ void Application::createWindow (const std::string &title) {
 }
 
 void Application::initGL () {
-  glViewport(0, 0, 600, 600);
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 }

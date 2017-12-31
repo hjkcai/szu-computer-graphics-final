@@ -8,6 +8,8 @@
 #include "render.h"
 #include "scene.h"
 
+class Renderer;
+
 class Application {
 private:
   Scene *scene = NULL;

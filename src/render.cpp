@@ -1,15 +1,20 @@
 #include "render.h"
 
 #include <iostream>
+#include <algorithm>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Renderer::Renderer () {
+Renderer::Renderer (const float &w, const float &h) {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
   shader = new SceneShader();
   initShadow();
+
+  renderSize = std::max(w, h);
+  offsetX = w > h ? 0 : (w - h);
+  offsetY = h > w ? 0 : (h - w);
 }
 
 void Renderer::initShadow () {
@@ -78,7 +83,7 @@ void Renderer::renderShadow (const Scene *scene) {
 void Renderer::renderScene (const Scene *scene) {
   // 然后按正常方式，渲染整个场景
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glViewport(0, 0, 600, 600);
+  glViewport(offsetX, offsetY, renderSize, renderSize);
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
   clear();
