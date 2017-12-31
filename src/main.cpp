@@ -113,7 +113,7 @@ private:
 
   const float treeScale = 0.7;            // 树木缩放
   const float grassScale = 0.5;           // 草缩放
-  const float carScale = 0.3;             // 汽车缩放
+  const float carScale = 0.2;             // 汽车缩放
   const int trailSize = 3;                // 路面大小
 
 public:
