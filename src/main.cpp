@@ -212,9 +212,9 @@ public:
       }
 
       if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-        rotationY += 1;
-      } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
         rotationY -= 1;
+      } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+        rotationY += 1;
       }
 
       if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
