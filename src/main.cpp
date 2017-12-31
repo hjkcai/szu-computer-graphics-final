@@ -187,28 +187,29 @@ public:
   }
 
   void tick (const sf::RenderWindow *window) {
-    if (!window->hasFocus()) return;
+    if (window->hasFocus()) {
+      if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+        car->acceleration = 0.5;
+      } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        car->acceleration = -0.5;
+      } else {
+        car->acceleration = 0;
+      }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-      car->acceleration = 0.5;
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-      car->acceleration = -0.5;
-    } else {
-      car->acceleration = 0;
-    }
+      if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        car->setWheelRotation(car->getWheelRotation() - 8);
+      } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        car->setWheelRotation(car->getWheelRotation() + 8);
+      }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-      car->setWheelRotation(car->getWheelRotation() - 8);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-      car->setWheelRotation(car->getWheelRotation() + 8);
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-      exit(0);
+      if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+        exit(0);
+      }
     }
 
     car->move();
 
+    // 调整视角，使视角固定在车的后方
     auto direction = car->getRotationY();
     auto sinDir = glm::sin(glm::radians(direction));
     auto cosDir = glm::cos(glm::radians(direction));
