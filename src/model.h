@@ -35,6 +35,7 @@ public:
   float getZ () const { return z; }
   void setZ (const float &value) { z = value; update(); }
 
+  glm::vec3 getPosition () const { return glm::vec3(x, y, z); }
   void setPosition (const glm::vec3 &value) {
     x = value.x;
     y = value.y;
