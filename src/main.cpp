@@ -102,6 +102,9 @@ private:
   // 相机到视点的位置差
   glm::vec3 atToEye = glm::vec3(26, -14, 26);
 
+  // 额外的视角旋转量
+  float rotationY = 0;
+
 public:
   MyScene () {
     // 设置背景色
@@ -209,6 +212,12 @@ public:
         car->setWheelRotation(car->getWheelRotation() + 8);
       }
 
+      if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+        rotationY += 1;
+      } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+        rotationY -= 1;
+      }
+
       if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
         exit(0);
       }
@@ -217,7 +226,7 @@ public:
     car->move();
 
     // 调整视角，使视角固定在车的后方
-    auto direction = car->getRotationY();
+    auto direction = car->getRotationY() + rotationY;
     auto sinDir = glm::sin(glm::radians(direction));
     auto cosDir = glm::cos(glm::radians(direction));
     auto dirVector = glm::vec3(sinDir, 1, cosDir);
