@@ -99,10 +99,10 @@ private:
   Car* car;
 
   // 相机到汽车的位置差
-  glm::vec3 eyeToCar = glm::vec3(-3, 2, -3);
+  glm::vec3 eyeToCar = glm::vec3(-3.5, 2, -3.5);
 
   // 相机到视点的位置差
-  glm::vec3 atToEye = glm::vec3(26, -14, 26);
+  glm::vec3 atToEye = glm::vec3(13, -5, 13);
 
   // 额外的视角旋转量
   float rotationY = 0;
@@ -113,7 +113,7 @@ private:
 
   const float treeScale = 0.7;            // 树木缩放
   const float grassScale = 0.5;           // 草缩放
-  const float carScale = 0.2;             // 汽车缩放
+  const float carScale = 0.3;             // 汽车缩放
   const int trailSize = 3;                // 路面大小
 
 public:
