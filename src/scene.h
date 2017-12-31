@@ -34,7 +34,7 @@ public:
   LightingOptions* getLightingOptions () const { return light; }
   std::vector<ModelGroup*> getModelGroups () const { return modelGroups; }
 
-  virtual void onKeydown (const sf::Event::KeyEvent &e) = 0;
+  virtual void tick () = 0;
 };
 
 #endif

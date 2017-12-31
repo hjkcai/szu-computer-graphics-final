@@ -43,23 +43,14 @@ void Application::run (Scene *theScene) {
     renderer->render(scene);
     window->display();
     handleWindowEvents();
+
+    scene->tick();
   }
 }
 
 void Application::handleWindowEvents () {
   sf::Event e;
   while (window->pollEvent(e)) {
-    switch (e.type) {
-      case sf::Event::Closed:
-        window->close();
-        break;
-
-      case sf::Event::KeyPressed:
-        scene->onKeydown(e.key);
-        break;
-
-      default:
-        break;
-    }
+    /* wait here */
   }
 }
