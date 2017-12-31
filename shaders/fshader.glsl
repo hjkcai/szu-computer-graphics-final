@@ -43,14 +43,15 @@ vec2 poissonDisk[16] = vec2[] (
 void main () {
 	// 定义颜色
 	vec3 diffuseColor;
-	vec3 ambientColor = vec3(0.1, 0.1, 0.1) * diffuseColor;
-	vec3 specularColor = materialSpecularColor;
 
 	if (useTexture) {
 		diffuseColor = texture(textureSampler, UV).rgb;
 	} else {
 		diffuseColor = materialDiffuseColor;
 	}
+
+	vec3 ambientColor = vec3(0.25, 0.25, 0.25) * diffuseColor;
+	vec3 specularColor = materialSpecularColor;
 
 	// 一个片源的能见度
 	float visibility = 1.0;
