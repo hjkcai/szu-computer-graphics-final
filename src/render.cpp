@@ -70,7 +70,7 @@ void Renderer::renderShadow (const Scene *scene) {
   depthShader->use();
 
   auto V = depthViewMatrix = glm::lookAt(scene->getLightingOptions()->position, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-  auto P = depthProjectionMatrix = glm::ortho<float>(-25, 25, -25, 25, -25, 25);
+  auto P = depthProjectionMatrix = glm::ortho<float>(-40, 40, -40, 40, -40, 40);
 
   for (auto group : scene->getModelGroups()) {
     for (auto model : group->getModels()) {
