@@ -4,8 +4,6 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Application *app;
-
 // 汽车模型
 class Car : public ModelGroup {
 private:
@@ -17,6 +15,10 @@ private:
   float r = 0;
 
 protected:
+  const float friction = 0.3;       // 摩擦大小
+  const float wheelBack = 3;        // 车轮回正速度
+  const float maxVelocity = 20;     // 最大速度
+
   void update () {
     ModelGroup::update();
 
@@ -43,7 +45,17 @@ protected:
     }
   }
 
+  float shift (const float &value, const float &amount) {
+    if (glm::abs(value) < 1e-3) return 0;
+    else if (value > 0) return value - amount;
+    else if (value < 0) return value + amount;
+    else return value;
+  }
+
 public:
+  float acceleration = 0;     // 加速度
+  float velocity = 0;         // 速度
+
   Car () : ModelGroup("models/car.obj") {
     for (auto model : models) {
       model->setY(0.54);
@@ -53,6 +65,25 @@ public:
 
   float getWheelRotation () const { return r; }
   void setWheelRotation (const float &value) { r = value; update(); }
+
+  void move () {
+    // 计算速度
+    auto &direction = rotationY;
+    auto sinDir = glm::sin(glm::radians(direction));
+    auto cosDir = glm::cos(glm::radians(direction));
+
+    velocity = shift(velocity + acceleration, friction);
+    velocity = glm::clamp(velocity + acceleration, -8.0f, 20.0f);
+
+    x += sinDir * velocity / 100;
+    z += cosDir * velocity / 100;
+
+    // 计算车身和车轮方向
+    direction = direction - 0.05 * (velocity / maxVelocity) * r;
+    r = glm::clamp(shift(r, wheelBack), -45.0f, 45.0f);
+
+    update();
+  }
 };
 
 class MyScene : public Scene {
@@ -61,7 +92,6 @@ private:
   std::vector<ModelGroup*> grasses;
   ModelGroup *ground;
   Car* car;
-  glm::vec3 carPos = glm::vec3(0, 0, -18);
 
   void setModelPos (ModelGroup *group, const float &x, const float &y, const float &z) {
     for (auto model : group->getModels()) {
@@ -154,52 +184,41 @@ public:
     modelGroups.push_back(ground);
   }
 
-  void tick () {
-    if (!app->window->hasFocus()) return;
+  void tick (const sf::RenderWindow *window) {
+    if (!window->hasFocus()) return;
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-      auto direction = car->getRotationY();
-      auto r = car->getWheelRotation();
-
-      float directionDeltaFactor;
-      if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        directionDeltaFactor = 1;
-      } else {
-        directionDeltaFactor = -1;
-      }
-
-      auto sinDir = glm::sin(glm::radians(direction));
-      auto cosDir = glm::cos(glm::radians(direction));
-
-      auto dx = 0.1 * directionDeltaFactor * sinDir;
-      auto dz = 0.1 * directionDeltaFactor * cosDir;
-
-      carPos.x += dx;
-      carPos.z += dz;
-
-      camera->eye = glm::vec3(-8 * sinDir, 6, -8 * cosDir) + carPos;
-      camera->at = glm::vec3(26 * sinDir, -14, 26 * cosDir) + camera->eye;
-
-      car->setRotationY(car->getRotationY() - r * 0.1 * directionDeltaFactor);
-      car->setPosition(carPos);
-      camera->update();
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+      car->acceleration = 0.5;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+      car->acceleration = -0.5;
+    } else {
+      car->acceleration = 0;
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-      car->setWheelRotation(std::max(-45.0f, car->getWheelRotation() - 1));
+      car->setWheelRotation(car->getWheelRotation() - 8);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-      car->setWheelRotation(std::min(45.0f, car->getWheelRotation() + 1));
+      car->setWheelRotation(car->getWheelRotation() + 8);
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
       exit(0);
     }
+
+    car->move();
+
+    auto direction = car->getRotationY();
+    auto sinDir = glm::sin(glm::radians(direction));
+    auto cosDir = glm::cos(glm::radians(direction));
+    camera->eye = glm::vec3(-8 * sinDir, 6, -8 * cosDir) + car->getPosition();
+    camera->at = glm::vec3(26 * sinDir, -14, 26 * cosDir) + camera->eye;
+    camera->update();
   }
 };
 
 int main () {
-  app = new Application("2015150317_final");
-
+  Application *app = new Application("2015150317_final");
   MyScene *scene = new MyScene();
+
   app->run(scene);
 }
