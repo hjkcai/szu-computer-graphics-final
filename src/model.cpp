@@ -15,7 +15,10 @@ void AbstractModel::update () {
     glm::rotate(glm::radians(rotationZ), glm::vec3(0, 0, 1)) *
 
     // 缩放
-    glm::scale(glm::vec3(scale));
+    glm::scale(glm::vec3(scale)) *
+
+    // 自定义变换
+    transform;
 }
 
 void AbstractModel::copyFrom (const AbstractModel *model) {
@@ -26,6 +29,7 @@ void AbstractModel::copyFrom (const AbstractModel *model) {
   rotationX = model->rotationX;
   rotationY = model->rotationY;
   rotationZ = model->rotationZ;
+  transform = model->transform;
   update();
 }
 

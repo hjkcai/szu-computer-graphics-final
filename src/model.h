@@ -16,6 +16,7 @@ protected:
   float x = 0, y = 0, z = 0;
   float rotationX = 0, rotationY = 0, rotationZ = 0;
 
+  glm::mat4 transform;
   glm::mat4 _modelMatrix = glm::mat4();
 
   void update ();
@@ -43,11 +44,14 @@ public:
   float getRotationZ () const { return rotationZ; }
   void setRotationZ (const float &value) { rotationZ = value; update(); }
 
+  glm::mat4 getTransform () const { return transform; }
+  void setTransform (const glm::mat4 &value) { transform = value; update(); }
+
   glm::mat4 getModelMatrix () const { return _modelMatrix; }
 };
 
 class Model : public AbstractModel {
-private:
+protected:
   bool cloned = false;
 
   GLuint vBuffer, uvBuffer, normalBuffer;
@@ -85,7 +89,7 @@ public:
 };
 
 class ModelGroup : public AbstractModel {
-private:
+protected:
   bool cloned = false;
   std::vector<Model*> models;
 
