@@ -15,7 +15,7 @@ Application::~Application () {
 
 void Application::createWindow (const std::string &title) {
   sf::ContextSettings settings;
-  settings.antialiasingLevel = 0;
+  settings.antialiasingLevel = 8;
   settings.majorVersion = 3;
   settings.minorVersion = 3;
   settings.depthBits = 24;
