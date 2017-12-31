@@ -130,7 +130,7 @@ void ModelGroup::loadObj (const std::string &obj) {
     int lastMaterial = shapes[0].mesh.material_ids[0];
 
     for (size_t f = 0, l = shapes[s].mesh.num_face_vertices.size(); f <= l; f++) {
-      if (shapes[s].mesh.material_ids[f] != lastMaterial || f == l) {
+      if (f == l || shapes[s].mesh.material_ids[f] != lastMaterial) {
         tinyobj::material_t *material = NULL;
         if (lastMaterial != -1) {
           material = new tinyobj::material_t(materials[lastMaterial]);
