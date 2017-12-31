@@ -90,10 +90,27 @@ public:
 
 class MyScene : public Scene {
 private:
+  // 模型定义
   std::vector<ModelGroup*> trees;
   std::vector<ModelGroup*> grasses;
   ModelGroup *ground;
   Car* car;
+
+  // 相机到汽车的位置差
+  glm::vec3 eyeToCar = glm::vec3(-8, 6, -8);
+
+  // 相机到视点的位置差
+  glm::vec3 atToEye = glm::vec3(26, -14, 26);
+
+public:
+  MyScene () {
+    // 设置背景色
+    glClearColor(0.793f, 1.0f, 0.942f, 1.0f);
+
+    initCameraAndLight();
+    initModels();
+    initScene();
+  }
 
   // 设置模型组中所有模型的子模型的位置，这样便于接下来统一移动模型组
   void setModelPos (ModelGroup *group, const float &x, const float &y, const float &z) {
@@ -104,22 +121,23 @@ private:
     }
   }
 
-public:
-  MyScene () {
-    // 设置背景色
-    glClearColor(0.793f, 1.0f, 0.942f, 1.0f);
+  // 随机生成一个不在路中间的点
+  glm::vec3 generatePoint () {
+    auto x = (rand() % 3200 - 1600) / 100.0f;
+    x = x + (x < 0 ? -4 : 4);
 
-    // 设置光照和相机参数
+    auto z = (rand() % 4000 - 2000) / 100.0f;
+    return glm::vec3(x, 0, z);
+  }
+
+  // 初始化光照和相机
+  void initCameraAndLight () {
     light->position = { 6, 20, -25 };
     light->power = 1000;
 
     camera->at = { 0, -8, 0 };
     camera->eye = { 0, 6, -26 };
     camera->update();
-
-    // 设置模型和场景
-    initModels();
-    initScene();
   }
 
   // 读入模型和纹理，并设置其初始参数
@@ -148,15 +166,6 @@ public:
 
     ground = new ModelGroup("models/ground.obj");
     ground->getModels()[0]->setTexture("models/ground.jpg");
-  }
-
-  // 随机生成一个不在路中间的点
-  glm::vec3 generatePoint () {
-    auto x = (rand() % 3200 - 1600) / 100.0f;
-    x = x + (x < 0 ? -4 : 4);
-
-    auto z = (rand() % 4000 - 2000) / 100.0f;
-    return glm::vec3(x, 0, z);
   }
 
   // 生成场景
@@ -211,8 +220,10 @@ public:
     auto direction = car->getRotationY();
     auto sinDir = glm::sin(glm::radians(direction));
     auto cosDir = glm::cos(glm::radians(direction));
-    camera->eye = glm::vec3(-8 * sinDir, 6, -8 * cosDir) + car->getPosition();
-    camera->at = glm::vec3(26 * sinDir, -14, 26 * cosDir) + camera->eye;
+    auto dirVector = glm::vec3(sinDir, 1, cosDir);
+
+    camera->eye = eyeToCar * dirVector + car->getPosition();
+    camera->at = atToEye * dirVector + camera->eye;
     camera->update();
   }
 };
