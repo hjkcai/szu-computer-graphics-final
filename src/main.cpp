@@ -12,13 +12,16 @@ protected:
   float dxr = 1.73005, dyr = -1.10560, dzr = 1.11338;
 
   // 左前轮和右前轮的旋转角度
-  float r = 0;
+  float wheelRotation = 0;
 
   const float friction = 0.3;             // 摩擦大小
   const float wheelBack = 4;              // 车轮回正速度
   const float maxVelocity = 20;           // 最大速度
   const float maxNegativeVelocity = -8;   // 最大倒车速度
   const float maxWheelAngle = 45;         // 车轮最大旋转角度
+
+  const float movementLambda = 0.01;      // 汽车移动时的位置计算常量
+  const float wheelLambda = 0.04;         // 汽车转向时的旋转计算常量
 
   void update () {
     ModelGroup::update();
@@ -28,7 +31,7 @@ protected:
       auto cylinderPart = models[i];
       auto transform =
         glm::translate(glm::vec3(-dxl, -dyl, -dzl)) *
-        glm::rotate(glm::radians(-r), glm::vec3(0, 1, 0)) *
+        glm::rotate(glm::radians(-wheelRotation), glm::vec3(0, 1, 0)) *
         glm::translate(glm::vec3(dxl, dyl, dzl));
 
       cylinderPart->setTransform(transform);
@@ -39,7 +42,7 @@ protected:
       auto cylinderPart = models[i];
       auto transform =
         glm::translate(glm::vec3(-dxr, -dyr, -dzr)) *
-        glm::rotate(glm::radians(-r), glm::vec3(0, 1, 0)) *
+        glm::rotate(glm::radians(-wheelRotation), glm::vec3(0, 1, 0)) *
         glm::translate(glm::vec3(dxr, dyr, dzr));
 
       cylinderPart->setTransform(transform);
@@ -64,8 +67,8 @@ public:
     }
   }
 
-  float getWheelRotation () const { return r; }
-  void setWheelRotation (const float &value) { r = value; update(); }
+  float getWheelRotation () const { return wheelRotation; }
+  void setWheelRotation (const float &value) { wheelRotation = value; update(); }
 
   void move () {
     // 计算速度
@@ -76,12 +79,12 @@ public:
     velocity = shift(velocity + acceleration, friction);
     velocity = glm::clamp(velocity + acceleration, maxNegativeVelocity, maxVelocity);
 
-    x += sinDir * velocity / 100;
-    z += cosDir * velocity / 100;
+    x += sinDir * velocity * movementLambda;
+    z += cosDir * velocity * movementLambda;
 
     // 计算车身和车轮方向
-    direction = direction - 0.03 * (velocity / maxVelocity) * r;
-    r = glm::clamp(shift(r, wheelBack), -maxWheelAngle, maxWheelAngle);
+    direction = direction - wheelLambda * (velocity / maxVelocity) * wheelRotation;
+    wheelRotation = glm::clamp(shift(wheelRotation, wheelBack), -maxWheelAngle, maxWheelAngle);
 
     update();
   }
@@ -96,7 +99,7 @@ private:
   Car* car;
 
   // 相机到汽车的位置差
-  glm::vec3 eyeToCar = glm::vec3(-5, 3.5, -5);
+  glm::vec3 eyeToCar = glm::vec3(-3, 2, -3);
 
   // 相机到视点的位置差
   glm::vec3 atToEye = glm::vec3(26, -14, 26);
@@ -108,9 +111,9 @@ private:
   const float wheelSpeed = 8;             // 车轮旋转速度
   const float cameraRotationSpeed = 1;    // 额外的视角旋转速度
 
-  const float treeScale = 0.5;            // 树木缩放
-  const float grassScale = 0.8;           // 草缩放
-  const float carScale = 0.3;             // 汽车缩放
+  const float treeScale = 0.8;            // 树木缩放
+  const float grassScale = 0.5;           // 草缩放
+  const float carScale = 0.2;             // 汽车缩放
   const int trailSize = 4;                // 路面大小
 
 public:
