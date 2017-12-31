@@ -111,6 +111,7 @@ private:
   const float treeScale = 0.5;            // 树木缩放
   const float grassScale = 0.8;           // 草缩放
   const float carScale = 0.3;             // 汽车缩放
+  const int trailSize = 4;                // 路面大小
 
 public:
   MyScene () {
@@ -134,7 +135,7 @@ public:
 
   // 随机生成一个不在路中间的点
   glm::vec3 generatePoint () {
-    auto x = (rand() % 3200 - 1600) / 100.0f;
+    auto x = (rand() % (4000 - trailSize * 100 * 2) - (2000 - trailSize * 100)) / 100.0f;
     x = x + (x < 0 ? -4 : 4);
 
     auto z = (rand() % 4000 - 2000) / 100.0f;
