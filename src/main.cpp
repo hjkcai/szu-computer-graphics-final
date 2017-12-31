@@ -99,10 +99,10 @@ private:
   Car* car;
 
   // 相机到汽车的位置差
-  glm::vec3 eyeToCar = glm::vec3(-3.5, 2, -3.5);
+  glm::vec3 eyeToCar = glm::vec3(-8, 6, -8);
 
   // 相机到视点的位置差
-  glm::vec3 atToEye = glm::vec3(13, -5, 13);
+  glm::vec3 atToEye = glm::vec3(26, -14, 26);
 
   // 额外的视角旋转量
   float rotationY = 0;
@@ -111,10 +111,10 @@ private:
   const float wheelSpeed = 8;             // 车轮旋转速度
   const float cameraRotationSpeed = 1;    // 额外的视角旋转速度
 
-  const float treeScale = 0.7;            // 树木缩放
-  const float grassScale = 0.5;           // 草缩放
-  const float carScale = 0.2;             // 汽车缩放
-  const int trailSize = 3;                // 路面大小
+  const float treeScale = 1.0;            // 树木缩放
+  const float grassScale = 1.5;           // 草缩放
+  const float carScale = 0.5;             // 汽车缩放
+  const int trailSize = 4;                // 路面大小
 
 public:
   MyScene () {
