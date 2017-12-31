@@ -54,9 +54,8 @@ class MyScene : public Scene {
 private:
   std::vector<ModelGroup*> trees;
   std::vector<ModelGroup*> grasses;
-
+  ModelGroup *ground;
   Car* car;
-  float r = 0;
 
   void setModelPos (ModelGroup *group, const float &x, const float &y, const float &z) {
     for (auto model : group->getModels()) {
@@ -68,13 +67,24 @@ private:
 
 public:
   MyScene () {
+    // 设置背景色
+    glClearColor(0.793f, 1.0f, 0.942f, 1.0f);
+
     // 设置光照和相机参数
-    light->position = { -8, 12, -8 };
-    light->power = 300;
-    camera->eye = { 0, 4, -8 };
+    light->position = { 6, 15, -15 };
+    light->power = 400;
+
+    camera->at = { 0, -8, 0 };
+    camera->eye = { 0, 6, -26 };
     camera->update();
 
-    // 读入模型和纹理，并设置其初始参数
+    // 设置模型和场景
+    initModels();
+    initScene();
+  }
+
+  // 读入模型和纹理，并设置其初始参数
+  void initModels () {
     auto tree1 = new ModelGroup("models/tree-1.obj");
     setModelPos(tree1, 0, 1.895607, 0);
     trees.push_back(tree1);
@@ -91,29 +101,79 @@ public:
     setModelPos(grass2, 0.51, 0.107, 0.369);
     grasses.push_back(grass2);
 
-    auto grass3 = new ModelGroup("models/wild-grasses-3.obj");
-    setModelPos(grass3, -0.553, 0.081, 0.47);
-    grasses.push_back(grass3);
+    // auto grass3 = new ModelGroup("models/wild-grasses-3.obj");
+    // setModelPos(grass3, -0.553, 0.081, 0.47);
+    // grasses.push_back(grass3);
 
     auto grass4 = new ModelGroup("models/wild-grasses-4.obj");
     setModelPos(grass4, 0.515, -0.045, -0.503);
     grasses.push_back(grass4);
-    modelGroups.push_back(grass4);
 
     car = new Car();
     setModelPos(car, 0, 0.54, 0);
+
+    ground = new ModelGroup("models/ground.obj");
+    ground->getModels()[0]->setTexture("models/ground.jpg");
+  }
+
+  glm::vec3 generatePoint () {
+    auto x = (rand() % 3200 - 1600) / 100.0f;
+    x = x + (x < 0 ? -4 : 4);
+
+    auto z = (rand() % 4000 - 2000) / 100.0f;
+    return glm::vec3(x, 0, z);
+  }
+
+  // 生成场景
+  void initScene () {
+    // 生成草地和树林
+    srand(time(NULL));
+    for (int i = 0; i < 50; i++) {
+      auto tree = trees[i % trees.size()]->clone();
+      tree->setPosition(generatePoint());
+      modelGroups.push_back(tree);
+    }
+
+    for (int i = 0; i < 1000; i++) {
+      auto grass = grasses[i % grasses.size()]->clone();
+      grass->setPosition(generatePoint());
+      grass->setScale(1.5);
+      modelGroups.push_back(grass);
+    }
+
+    car->setScale(0.5);
+    car->setRotationY(90);
+    car->setZ(-18);
     modelGroups.push_back(car);
 
-    auto ground = new ModelGroup("models/ground.obj");
-    ground->getModels()[0]->setTexture("textures/ground.jpg");
+    // 加入地面
     modelGroups.push_back(ground);
   }
 
   void onKeydown (const sf::Event::KeyEvent &e) {
+    auto &data = camera->eye;
+    auto &x = data.x, &y = data.y, &z = data.z;
+    float d = 0.1;
+
     switch (e.code) {
+      case sf::Keyboard::X:
+        x += e.shift ? -d : d;
+        break;
+
+      case sf::Keyboard::Y:
+        y += e.shift ? -d : d;
+        break;
+
+      case sf::Keyboard::Z:
+        z += e.shift ? -d : d;
+        break;
+
       default:
         break;
     }
+
+    camera->update();
+    std::cout << x << '\t' << y << '\t' << z << std::endl;
   }
 };
 
