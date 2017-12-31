@@ -57,9 +57,9 @@ void main () {
 	float bias = 0.01;
 
 	for (int i = 0; i < 4; i++) {
-		// 如果一个片源完全在阴影中，能见度为 1 - 0.2 * 4 = 0.2
+		// 如果一个片源完全在阴影中，能见度为 1 - 0.15 * 4 = 0.4
 		// 已经很黑了
-		visibility -= 0.2 * (1.0 - texture(shadowMap, vec3(ShadowCoord.xy + poissonDisk[i] / 700.0, (ShadowCoord.z - bias) / ShadowCoord.w)));
+		visibility -= 0.15 * (1.0 - texture(shadowMap, vec3(ShadowCoord.xy + poissonDisk[i] / 700.0, (ShadowCoord.z - bias) / ShadowCoord.w)));
 	}
 
 	if (lightingEnabled) {
