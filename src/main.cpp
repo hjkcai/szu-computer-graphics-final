@@ -1,7 +1,10 @@
 #include "app.h"
 #include <iostream>
+#include <algorithm>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+Application *app;
 
 // 汽车模型
 class Car : public ModelGroup {
@@ -22,8 +25,7 @@ protected:
       auto cylinderPart = models[i];
       auto transform =
         glm::translate(glm::vec3(-dxl, -dyl, -dzl)) *
-        glm::rotate(glm::radians(rx), glm::vec3(1, 0, 0)) *
-        glm::rotate(glm::radians(r), glm::vec3(0, 1, 0)) *
+        glm::rotate(glm::radians(-r), glm::vec3(0, 1, 0)) *
         glm::translate(glm::vec3(dxl, dyl, dzl));
 
       cylinderPart->setTransform(transform);
@@ -34,7 +36,6 @@ protected:
       auto cylinderPart = models[i];
       auto transform =
         glm::translate(glm::vec3(-dxr, -dyr, -dzr)) *
-        glm::rotate(glm::radians(rx), glm::vec3(1, 0, 0)) *
         glm::rotate(glm::radians(-r), glm::vec3(0, 1, 0)) *
         glm::translate(glm::vec3(dxr, dyr, dzr));
 
@@ -43,8 +44,12 @@ protected:
   }
 
 public:
-  float rx = 0;
-  Car () : ModelGroup("models/car.obj") {}
+  Car () : ModelGroup("models/car.obj") {
+    for (auto model : models) {
+      model->setY(0.54);
+      model->setRotationY(90);
+    }
+  }
 
   float getWheelRotation () const { return r; }
   void setWheelRotation (const float &value) { r = value; update(); }
@@ -56,6 +61,7 @@ private:
   std::vector<ModelGroup*> grasses;
   ModelGroup *ground;
   Car* car;
+  glm::vec3 carPos = glm::vec3(0, 0, -18);
 
   void setModelPos (ModelGroup *group, const float &x, const float &y, const float &z) {
     for (auto model : group->getModels()) {
@@ -71,8 +77,8 @@ public:
     glClearColor(0.793f, 1.0f, 0.942f, 1.0f);
 
     // 设置光照和相机参数
-    light->position = { 6, 15, -15 };
-    light->power = 400;
+    light->position = { 6, 20, -25 };
+    light->power = 1000;
 
     camera->at = { 0, -8, 0 };
     camera->eye = { 0, 6, -26 };
@@ -110,7 +116,6 @@ public:
     grasses.push_back(grass4);
 
     car = new Car();
-    setModelPos(car, 0, 0.54, 0);
 
     ground = new ModelGroup("models/ground.obj");
     ground->getModels()[0]->setTexture("models/ground.jpg");
@@ -142,7 +147,6 @@ public:
     }
 
     car->setScale(0.5);
-    car->setRotationY(90);
     car->setZ(-18);
     modelGroups.push_back(car);
 
@@ -150,36 +154,52 @@ public:
     modelGroups.push_back(ground);
   }
 
-  void onKeydown (const sf::Event::KeyEvent &e) {
-    auto &data = camera->eye;
-    auto &x = data.x, &y = data.y, &z = data.z;
-    float d = 0.1;
+  void tick () {
+    if (!app->window->hasFocus()) return;
 
-    switch (e.code) {
-      case sf::Keyboard::X:
-        x += e.shift ? -d : d;
-        break;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+      auto direction = car->getRotationY();
+      auto r = car->getWheelRotation();
 
-      case sf::Keyboard::Y:
-        y += e.shift ? -d : d;
-        break;
+      float directionDeltaFactor;
+      if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+        directionDeltaFactor = 1;
+      } else {
+        directionDeltaFactor = -1;
+      }
 
-      case sf::Keyboard::Z:
-        z += e.shift ? -d : d;
-        break;
+      auto sinDir = glm::sin(glm::radians(direction));
+      auto cosDir = glm::cos(glm::radians(direction));
 
-      default:
-        break;
+      auto dx = 0.1 * directionDeltaFactor * sinDir;
+      auto dz = 0.1 * directionDeltaFactor * cosDir;
+
+      carPos.x += dx;
+      carPos.z += dz;
+
+      camera->eye = glm::vec3(-8 * sinDir, 6, -8 * cosDir) + carPos;
+      camera->at = glm::vec3(26 * sinDir, -14, 26 * cosDir) + camera->eye;
+
+      car->setRotationY(car->getRotationY() - r * 0.1 * directionDeltaFactor);
+      car->setPosition(carPos);
+      camera->update();
     }
 
-    camera->update();
-    std::cout << x << '\t' << y << '\t' << z << std::endl;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+      car->setWheelRotation(std::max(-45.0f, car->getWheelRotation() - 1));
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+      car->setWheelRotation(std::min(45.0f, car->getWheelRotation() + 1));
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+      exit(0);
+    }
   }
 };
 
 int main () {
-  Application *app = new Application("2015150317_final");
-  MyScene *scene = new MyScene();
+  app = new Application("2015150317_final");
 
+  MyScene *scene = new MyScene();
   app->run(scene);
 }
