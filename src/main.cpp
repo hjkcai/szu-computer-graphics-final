@@ -104,14 +104,19 @@ private:
   // 额外的视角旋转量
   float rotationY = 0;
 
+  const float acceleration = 0.5;         // 加速度
+  const float wheelSpeed = 8;             // 车轮旋转速度
+  const float cameraRotationSpeed = 1;    // 额外的视角旋转速度
+
 public:
   MyScene () {
     // 设置背景色
     glClearColor(0.793f, 1.0f, 0.942f, 1.0f);
 
-    initCameraAndLight();
+    initLight();
     initModels();
     initScene();
+    car->move();
   }
 
   // 设置模型组中所有模型的子模型的位置，这样便于接下来统一移动模型组
@@ -132,14 +137,10 @@ public:
     return glm::vec3(x, 0, z);
   }
 
-  // 初始化光照和相机
-  void initCameraAndLight () {
+  // 初始化光照
+  void initLight () {
     light->position = { 6, 20, -25 };
     light->power = 1000;
-
-    camera->at = { 0, -8, 0 };
-    camera->eye = { 0, 6, -26 };
-    camera->update();
   }
 
   // 读入模型和纹理，并设置其初始参数
@@ -195,36 +196,8 @@ public:
     modelGroups.push_back(ground);
   }
 
-  void tick (const sf::RenderWindow *window) {
-    if (window->hasFocus()) {
-      if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        car->acceleration = 0.5;
-      } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        car->acceleration = -0.5;
-      } else {
-        car->acceleration = 0;
-      }
-
-      if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        car->setWheelRotation(car->getWheelRotation() - 8);
-      } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        car->setWheelRotation(car->getWheelRotation() + 8);
-      }
-
-      if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-        rotationY -= 1;
-      } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
-        rotationY += 1;
-      }
-
-      if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-        exit(0);
-      }
-    }
-
-    car->move();
-
-    // 调整视角，使视角固定在车的后方
+  // 调整视角，使视角固定在车的后方
+  void updateCamera () {
     auto direction = car->getRotationY() + rotationY;
     auto sinDir = glm::sin(glm::radians(direction));
     auto cosDir = glm::cos(glm::radians(direction));
@@ -233,6 +206,39 @@ public:
     camera->eye = eyeToCar * dirVector + car->getPosition();
     camera->at = atToEye * dirVector + camera->eye;
     camera->update();
+  }
+
+  // 处理键盘输入
+  void handleKeyEvents () {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+      car->acceleration = acceleration;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+      car->acceleration = -acceleration;
+    } else {
+      car->acceleration = 0;
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+      car->setWheelRotation(car->getWheelRotation() - wheelSpeed);
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+      car->setWheelRotation(car->getWheelRotation() + wheelSpeed);
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+      rotationY -= cameraRotationSpeed;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+      rotationY += cameraRotationSpeed;
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+      exit(0);
+    }
+  }
+
+  void tick (const sf::RenderWindow *window) {
+    if (window->hasFocus()) handleKeyEvents();
+    car->move();
+    updateCamera();
   }
 };
 
