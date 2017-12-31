@@ -95,6 +95,7 @@ private:
   ModelGroup *ground;
   Car* car;
 
+  // 设置模型组中所有模型的子模型的位置，这样便于接下来统一移动模型组
   void setModelPos (ModelGroup *group, const float &x, const float &y, const float &z) {
     for (auto model : group->getModels()) {
       model->setX(x);
@@ -139,13 +140,9 @@ public:
     setModelPos(grass2, 0.51, 0.107, 0.369);
     grasses.push_back(grass2);
 
-    // auto grass3 = new ModelGroup("models/wild-grasses-3.obj");
-    // setModelPos(grass3, -0.553, 0.081, 0.47);
-    // grasses.push_back(grass3);
-
-    auto grass4 = new ModelGroup("models/wild-grasses-4.obj");
-    setModelPos(grass4, 0.515, -0.045, -0.503);
-    grasses.push_back(grass4);
+    auto grass3 = new ModelGroup("models/wild-grasses-3.obj");
+    setModelPos(grass3, 0.515, -0.045, -0.503);
+    grasses.push_back(grass3);
 
     car = new Car();
 
@@ -153,6 +150,7 @@ public:
     ground->getModels()[0]->setTexture("models/ground.jpg");
   }
 
+  // 随机生成一个不在路中间的点
   glm::vec3 generatePoint () {
     auto x = (rand() % 3200 - 1600) / 100.0f;
     x = x + (x < 0 ? -4 : 4);
