@@ -111,10 +111,10 @@ private:
   const float wheelSpeed = 8;             // 车轮旋转速度
   const float cameraRotationSpeed = 1;    // 额外的视角旋转速度
 
-  const float treeScale = 0.8;            // 树木缩放
+  const float treeScale = 0.7;            // 树木缩放
   const float grassScale = 0.5;           // 草缩放
   const float carScale = 0.2;             // 汽车缩放
-  const int trailSize = 4;                // 路面大小
+  const int trailSize = 3;                // 路面大小
 
 public:
   MyScene () {
@@ -139,7 +139,7 @@ public:
   // 随机生成一个不在路中间的点
   glm::vec3 generatePoint () {
     auto x = (rand() % (4000 - trailSize * 100 * 2) - (2000 - trailSize * 100)) / 100.0f;
-    x = x + (x < 0 ? -4 : 4);
+    x = x + (x < 0 ? -trailSize : trailSize);
 
     auto z = (rand() % 4000 - 2000) / 100.0f;
     return glm::vec3(x, 0, z);
