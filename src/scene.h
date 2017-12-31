@@ -34,7 +34,7 @@ public:
   LightingOptions* getLightingOptions () const { return light; }
   std::vector<ModelGroup*> getModelGroups () const { return modelGroups; }
 
-  virtual void tick () = 0;
+  virtual void tick (const sf::RenderWindow *window) = 0;
 };
 
 #endif

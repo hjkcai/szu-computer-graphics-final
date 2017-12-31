@@ -44,7 +44,7 @@ void Application::run (Scene *theScene) {
     window->display();
     handleWindowEvents();
 
-    scene->tick();
+    scene->tick(window);
   }
 }
 
