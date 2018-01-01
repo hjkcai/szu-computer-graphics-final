@@ -17,6 +17,7 @@ Renderer::Renderer (const float &w, const float &h) {
   offsetY = h > w ? 0 : (h - w);
 }
 
+// 生成记录深度的 buffer
 void Renderer::initShadow () {
   glEnable(GL_CULL_FACE);
   depthShader = new DepthShader();

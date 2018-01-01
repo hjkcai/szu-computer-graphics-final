@@ -7,7 +7,6 @@
 class Camera {
 private:
   glm::mat4 projection, view;
-  glm::mat4 vp;
 
 public:
   // 透视投影参数
@@ -26,7 +25,6 @@ public:
 
   glm::mat4 getViewMatrix () const { return view; }
   glm::mat4 getProjectionMatrix () const { return projection; }
-  glm::mat4 getViewProjectionMatrix () const { return vp; }
 };
 
 #endif

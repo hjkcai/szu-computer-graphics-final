@@ -19,7 +19,10 @@ protected:
   glm::mat4 transform;
   glm::mat4 _modelMatrix = glm::mat4();
 
+  // 基于参数构造模型变换矩阵
   void update ();
+
+  // 将一个模型的参数完整复制到另一个模型
   void copyFrom (const AbstractModel *model);
 
 public:
@@ -58,6 +61,7 @@ public:
   glm::mat4 getModelMatrix () const { return _modelMatrix; }
 };
 
+// 单个模型
 class Model : public AbstractModel {
 protected:
   bool cloned = false;
@@ -74,7 +78,12 @@ protected:
   void init ();
 
 public:
-  Model (const std::vector<glm::vec3> &theVertices, const std::vector<glm::vec2> &theUVs, const std::vector<glm::vec3> &theNormals, tinyobj::material_t *theMaterial = NULL);
+  Model (
+    const std::vector<glm::vec3> &theVertices,
+    const std::vector<glm::vec2> &theUVs,
+    const std::vector<glm::vec3> &theNormals,
+    tinyobj::material_t *theMaterial = NULL
+  );
   ~Model ();
 
   Model* clone () const;
@@ -96,6 +105,7 @@ public:
   tinyobj::material_t* getMaterial () { return material; }
 };
 
+// 层次模型
 class ModelGroup : public AbstractModel {
 protected:
   bool cloned = false;

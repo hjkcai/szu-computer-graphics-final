@@ -223,6 +223,7 @@ public:
 
   // 处理键盘输入
   void handleKeyEvents () {
+    // 控制车辆前进后退
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
       car->acceleration = acceleration;
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
@@ -231,12 +232,14 @@ public:
       car->acceleration = 0;
     }
 
+    // 控制车辆方向
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
       car->setWheelRotation(car->getWheelRotation() - wheelSpeed);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
       car->setWheelRotation(car->getWheelRotation() + wheelSpeed);
     }
 
+    // 控制视角
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
       rotationY -= cameraRotationSpeed;
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {

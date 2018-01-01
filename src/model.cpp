@@ -4,6 +4,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+// 基于参数构造模型变换矩阵
 void AbstractModel::update () {
   _modelMatrix =
     // 平移
@@ -21,6 +22,7 @@ void AbstractModel::update () {
     transform;
 }
 
+// 将一个模型的参数完整复制到另一个模型
 void AbstractModel::copyFrom (const AbstractModel *model) {
   scale = model->scale;
   x = model->x;
@@ -33,8 +35,10 @@ void AbstractModel::copyFrom (const AbstractModel *model) {
   update();
 }
 
+// 构造克隆的模型
 Model::Model (): cloned(true) {}
 
+// 用 obj 文件读取出来的数据构造模型实例
 Model::Model (
   const std::vector<glm::vec3> &theVertices,
   const std::vector<glm::vec2> &theUVs,
@@ -54,6 +58,7 @@ Model::Model (
   }
 }
 
+// 释放 buffer
 Model::~Model () {
   if (!cloned) {
     delete vertices; vertices = NULL;
@@ -69,6 +74,7 @@ Model::~Model () {
   }
 }
 
+// 将读取到的数据传入 OpenGL 中
 void Model::init () {
   glGenBuffers(1, &vBuffer);
   glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
@@ -83,6 +89,7 @@ void Model::init () {
 	glBufferData(GL_ARRAY_BUFFER, normals->size() * sizeof(glm::vec3), normals->data(), GL_STATIC_DRAW);
 }
 
+// 克隆单个模型
 Model* Model::clone () const {
   Model *clonedModel = new Model();
   clonedModel->copyFrom(this);
@@ -97,12 +104,15 @@ Model* Model::clone () const {
   return clonedModel;
 }
 
+// 构造克隆的模型组
 ModelGroup::ModelGroup (): cloned(true) {}
 
+// 从 obj 中读取构造模型组
 ModelGroup::ModelGroup (const std::string &obj) {
   loadObj(obj);
 }
 
+// 清理模型组中的模型
 ModelGroup::~ModelGroup () {
   for (auto model : models) {
     delete model;
@@ -111,6 +121,8 @@ ModelGroup::~ModelGroup () {
   models.clear();
 }
 
+// 从 obj 中读取模型
+// 参考 https://github.com/syoyo/tinyobjloader
 void ModelGroup::loadObj (const std::string &obj) {
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
@@ -179,6 +191,7 @@ void ModelGroup::loadObj (const std::string &obj) {
   }
 }
 
+// 克隆模型组
 ModelGroup* ModelGroup::clone () const {
   ModelGroup *clonedGroup = new ModelGroup();
   clonedGroup->copyFrom(this);
